@@ -5,14 +5,54 @@
     <vendor>ninz9</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.java</depends>
+    <depends>org.jetbrains.kotlin</depends>
 
     <resource-bundle>messages.MyBundle</resource-bundle>
 
+    <actions>
+        <group id="com.github.ninz9.ideaplugin.actions">
+            <separator/>
+                <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForFunction" id="CreateCommentForFunction" text="Generate Comment for Method"/>
+            <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForClass" id="CreateCommentForClass" text="Create Comment for Class"/>
+<!--             <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForClassStream" id="CreateCommentForClassStream" text="Create Comment for Class Stream"/>-->
+            <separator/>
+            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+        </group>
+
+    </actions>
+
+
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.ninz9.ideaplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+
+        <applicationService serviceImplementation="com.github.ninz9.ideaplugin.configuration.PluginSettings"/>
+        <applicationService serviceImplementation="com.github.ninz9.ideaplugin.configuration.modelConfigurations.openAI.OpenAISetting"/>
+        <applicationService serviceImplementation="com.github.ninz9.ideaplugin.configuration.modelConfigurations.anthropic.AnthropicSetting"/>
+
+        <applicationConfigurable
+                parentId="tools"
+                instance="com.github.ninz9.ideaplugin.configuration.PluginConfigurable"
+                id="com.github.ninz9.ideaplugin.setting.ProjectSettingsConfigurable"
+                displayName="Idea Plugin"
+                nonDefaultProject="true"/>
+        <applicationConfigurable
+            parentId="com.github.ninz9.ideaplugin.setting.ProjectSettingsConfigurable"
+            instance="com.github.ninz9.ideaplugin.configuration.modelConfigurations.openAI.OpenAIConfigurable"
+            id="com.github.ninz9.ideaplugin.setting.modelConfigurations.openai.OpenAIConfigurable"
+            displayName="OpenAI Configuration"
+            nonDefaultProject="true"/>
+        <applicationConfigurable
+                parentId="com.github.ninz9.ideaplugin.setting.ProjectSettingsConfigurable"
+                instance="com.github.ninz9.ideaplugin.configuration.modelConfigurations.anthropic.AnthropicConfigurable"
+                id="com.github.ninz9.ideaplugin.setting.modelConfigurations.anthropic.AnthropicConfigurable"
+                displayName="Anthropic Configuration"
+                nonDefaultProject="true"/>
+        <notificationGroup displayType="BALLOON" id="IdeaPlugin"/>
+
     </extensions>
 
-    <applicationListeners>
-        <listener class="com.github.ninz9.ideaplugin.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
+<!--    <applicationListeners>-->
+<!--        <listener class="com.github.ninz9.ideaplugin.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>-->
+<!--    </applicationListeners>-->
 </idea-plugin>
