@@ -2,8 +2,10 @@ package com.github.ninz9.ideaplugin.llm.modelsImpl.openAI
 
 import com.github.ninz9.ideaplugin.llm.LLMClient
 import com.github.ninz9.ideaplugin.generators.ModelMessage
+import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.error.OpenAiErrorResponse
 import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.post.OpenAIResponse
 import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.stream.StreamOpenAiResponse
+import com.github.ninz9.ideaplugin.utils.ApiResponse
 import com.github.ninz9.ideaplugin.utils.HttpRequestHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -54,18 +56,18 @@ class OpenAiClient(
             throw Exception("API token not found")
         }
 
-//        val openAI = OpenAI(token, timeout = Timeout(socket = 10.seconds))
-//
-
         val response = HttpRequestHelper().post(
             url,
             requestBody,
             mapOf("Authorization" to authHeader),
-            OpenAIResponse::class.java
+            OpenAIResponse::class.java,
+            OpenAiErrorResponse::class.java
         )
 
-        return response.choices.first().message.content
-//        return openAI.chatCompletion(buildOpenAILibraryBody(messages)).choices.first().message.content ?: ""
+        when (response) {
+            is ApiResponse.Error -> throw Exception(response.error.error.message)
+            is ApiResponse.Success -> return response.data.choices.first().message.content
+        }
     }
 
     private fun buildJsonRequestBody(messages: Collection<ModelMessage>, isStreamRequest: Boolean): JSONObject {
@@ -83,25 +85,4 @@ class OpenAiClient(
         }
     }
 
-//    private fun buildOpenAILibraryBody(messages: Collection<ModelMessage>): ChatCompletionRequest {
-//        return ChatCompletionRequest(
-//            model = ModelId(model.modelName),
-//            messages = messages.map {
-//                ChatMessage (
-//                    role = roleAdapter(it.role),
-//                    content = it.message
-//                )
-//            },
-//            maxTokens = maxToken,
-//            temperature = temperature
-//        )
-//    }
-//
-//    private fun roleAdapter(role: String): ChatRole{
-//        return when (role) {
-//            "assistant" -> ChatRole.Assistant
-//            "user" -> ChatRole.User
-//            else -> ChatRole.User
-//        }
-//    }
 }

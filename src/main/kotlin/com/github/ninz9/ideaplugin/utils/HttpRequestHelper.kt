@@ -39,7 +39,7 @@ class HttpRequestHelper() {
                 override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
                     val source = response.body?.source()
                     if (source != null) {
-                        val buffer = source.buffer()
+                        val buffer = source.buffer
                         val json = buffer.readUtf8()
                         val obj = Gson().fromJson(json, responseType)
                         trySend(obj)
@@ -49,16 +49,31 @@ class HttpRequestHelper() {
         }
     }
 
-    fun <T> post(
+    fun <T, E> post(
         url: String,
         jsonBody: JSONObject,
         headers: Map<String, String> = emptyMap(),
-        responseType: Class<T>
-    ): T {
+        responseType: Class<T>,
+        errorType: Class<E>
+    ): ApiResponse<T, E> {
         val request = buildRequest(url, jsonBody, headers)
 
         val response = client.newCall(request).execute()
-        return Gson().fromJson(response.body?.string(), responseType)
+        val body = response.body?.string()
+
+        when(response.code) {
+            in 200..299 -> {
+                val data = Gson().fromJson(body, responseType)
+                return ApiResponse.Success(data)
+            }
+            in 400..499 -> {
+                val error = Gson().fromJson(body, errorType)
+                return ApiResponse.Error(error)
+            }
+            else -> {
+                throw Exception("Unexpected response code: ${response.code}")
+            }
+        }
     }
 
     private fun buildRequest(url: String, jsonBody: JSONObject, headers: Map<String, String> = emptyMap()): Request {
@@ -74,4 +89,10 @@ class HttpRequestHelper() {
 
         return requestBuilder.build()
     }
+}
+
+
+sealed class ApiResponse<out T, out E> {
+    data class Success<T>(val data: T) : ApiResponse<T, Nothing>()
+    data class Error<E>(val error: E) : ApiResponse<Nothing, E>()
 }
