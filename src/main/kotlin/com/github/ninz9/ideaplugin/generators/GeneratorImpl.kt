@@ -1,6 +1,6 @@
 package com.github.ninz9.ideaplugin.generators
 
-import com.github.ninz9.ideaplugin.llm.ModelFactoryWithSimplePromptGenerator
+import com.github.ninz9.ideaplugin.llm.ModelFactory
 import com.github.ninz9.ideaplugin.generators.promptGenerators.PromptGenerator
 import com.github.ninz9.ideaplugin.utils.readText
 import com.intellij.openapi.components.Service

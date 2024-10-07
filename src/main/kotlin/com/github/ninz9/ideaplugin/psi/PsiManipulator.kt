@@ -1,18 +1,8 @@
 package com.github.ninz9.ideaplugin.psi
 
-
-import com.intellij.openapi.components.service
 import com.intellij.openapi.editor.Editor
-import com.intellij.openapi.editor.ScrollType
-import com.intellij.openapi.fileEditor.FileEditorManager
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
-import com.intellij.psi.PsiFile
-import org.jetbrains.kotlin.idea.editor.fixers.end
-import org.jetbrains.kotlin.idea.editor.fixers.start
-import org.jetbrains.kotlin.psi.psiUtil.endOffset
-import org.jetbrains.kotlin.psi.psiUtil.startOffset
-
 
 interface PsiManipulator {
 

@@ -35,7 +35,7 @@ class OpenAISetting: PersistentStateComponent<OpenAISetting.State> {
 
     var openAiState = State()
 
-    override fun getState(): OpenAISetting.State? {
+    override fun getState(): State {
         return openAiState
     }
 
@@ -43,7 +43,7 @@ class OpenAISetting: PersistentStateComponent<OpenAISetting.State> {
         this.openAiState = state
     }
 
-    fun getApiToken(): String? {
+    fun getApiToken(): String {
         val apiKey = service<SecureTokenStorage>().getTokens(AiModel.OpenAI)
         println("token $apiKey")
         return apiKey

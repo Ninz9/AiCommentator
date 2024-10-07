@@ -6,11 +6,7 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.EnumComboBoxModel
 import com.intellij.ui.components.JBPasswordField
 import com.intellij.util.ui.FormBuilder
-import com.intellij.util.ui.components.BorderLayoutPanel
 import java.awt.BorderLayout
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import javax.swing.BoxLayout
 import javax.swing.JPanel
 import javax.swing.JTextField
 
