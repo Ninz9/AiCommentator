@@ -1,8 +1,6 @@
 package com.github.ninz9.ideaplugin.psi
 
 import com.github.ninz9.ideaplugin.utils.readText
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
@@ -36,9 +34,8 @@ class KotlinLangPsiManipulator : PsiManipulator {
         WriteCommandAction.runWriteCommandAction(project) {
             val commentElement = factory.createComment(comment)
             val parent = element.parent
-            if (parent.containingFile != null && parent != null) {
+            if (parent.containingFile != null && parent != null)
                 parent.addBefore(commentElement, element)
-            }
         }
     }
 

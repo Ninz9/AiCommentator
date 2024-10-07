@@ -15,7 +15,7 @@ class LangManipulatorFactory  {
         return when (lang) {
             "Java" -> service<JavaLangPsiManipulator>()
             "Kotlin" -> service<KotlinLangPsiManipulator>()
-            "Go" -> service<GoLangPsiManipulator>()
+//            "Go" -> service<GoLangPsiManipulator>()
             else -> throw IllegalArgumentException("Unsupported language")
         }
     }

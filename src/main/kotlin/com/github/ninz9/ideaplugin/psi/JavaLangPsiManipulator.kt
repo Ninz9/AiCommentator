@@ -31,11 +31,10 @@ class JavaLangPsiManipulator : PsiManipulator {
         val factory = JavaPsiFacade.getInstance(project).elementFactory
 
         WriteCommandAction.runWriteCommandAction(project) {
-            val commentElement = factory.createCommentFromText("/*\n$comment\n*/", element)
+            val commentElement = factory.createDocCommentFromText(comment, element)
             val parent = element.parent
             if (element.containingFile != null && parent != null) {
-                element.node.addChild(commentElement.node, element.firstChild.node)
-                //reformat code
+                parent.addBefore(commentElement, element)
             }
         }
     }
