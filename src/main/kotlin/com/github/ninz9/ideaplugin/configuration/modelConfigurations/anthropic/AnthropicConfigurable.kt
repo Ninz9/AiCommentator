@@ -5,16 +5,18 @@ import com.intellij.openapi.options.Configurable
 import com.intellij.openapi.util.NlsContexts
 import javax.swing.JComponent
 
-class AnthropicConfigurable: Configurable {
+class AnthropicConfigurable : Configurable {
 
-    val uiComponent = AnthropicUi()
+    private val uiComponent = AnthropicUi()
 
-    override fun getDisplayName(): String? {
+    override fun getDisplayName(): String {
         return "Anthropic AI"
     }
 
     override fun isModified(): Boolean {
-        return false
+
+        return this.uiComponent.currentState() != service<AnthropicSetting>().state
+                || this.uiComponent.token() != service<AnthropicSetting>().getApiToken()
     }
 
     override fun createComponent(): JComponent? {
@@ -22,6 +24,14 @@ class AnthropicConfigurable: Configurable {
     }
 
     override fun apply() {
-        println("boba")
+        val currentState = uiComponent.currentState()
+        val token = uiComponent.token()
+
+        if (currentState.model != service<AnthropicSetting>().state.model)
+            service<AnthropicSetting>().loadState(currentState)
+
+        if (token != service<AnthropicSetting>().getApiToken())
+            service<AnthropicSetting>().setApiToken(token)
+
     }
 }
