@@ -1,13 +1,12 @@
 package com.github.ninz9.ideaplugin.configuration
 
-import com.github.ninz9.ideaplugin.ui.configUiComponents.PluginSettingComponent
 import com.intellij.openapi.components.service
 import com.intellij.openapi.options.Configurable
 import javax.swing.JComponent
 
 class PluginConfigurable: Configurable {
 
-    private var settingUiComponent: PluginSettingComponent = PluginSettingComponent()
+    private var settingUiComponent: PluginSettingUi = PluginSettingUi()
 
     override fun createComponent(): JComponent {
         return settingUiComponent.getComponent()

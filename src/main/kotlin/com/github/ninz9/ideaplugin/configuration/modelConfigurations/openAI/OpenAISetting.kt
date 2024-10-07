@@ -18,6 +18,19 @@ class OpenAISetting: PersistentStateComponent<OpenAISetting.State> {
         var currentModel: AvailableOpenAIModels = AvailableOpenAIModels.entries.first()
         var temperature: Double = 0.7
         var maxTokens: Int = 1024
+
+        override fun equals(other: Any?): Boolean {
+            if (this === other) return true
+            if (javaClass != other?.javaClass) return false
+
+            other as State
+
+            if (currentModel != other.currentModel) return false
+            if (temperature != other.temperature) return false
+            if (maxTokens != other.maxTokens) return false
+
+            return true
+        }
     }
 
     var openAiState = State()

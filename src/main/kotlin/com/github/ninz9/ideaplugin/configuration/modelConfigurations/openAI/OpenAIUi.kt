@@ -6,6 +6,11 @@ import com.intellij.openapi.ui.ComboBox
 import com.intellij.ui.EnumComboBoxModel
 import com.intellij.ui.components.JBPasswordField
 import com.intellij.util.ui.FormBuilder
+import com.intellij.util.ui.components.BorderLayoutPanel
+import java.awt.BorderLayout
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import javax.swing.BoxLayout
 import javax.swing.JPanel
 import javax.swing.JTextField
 
@@ -13,16 +18,14 @@ import javax.swing.JTextField
 class OpenAIUi {
     private val tokenField: JBPasswordField = JBPasswordField()
     private val currentModelComboBox: ComboBox<AvailableOpenAIModels> =
-        ComboBox<AvailableOpenAIModels>(EnumComboBoxModel(AvailableOpenAIModels::class.java)).apply {
+        ComboBox(EnumComboBoxModel(AvailableOpenAIModels::class.java)).apply {
             selectedItem = service<OpenAISetting>().openAiState.currentModel
         }
     private val temperatureField: JTextField = JTextField(service<OpenAISetting>().openAiState.temperature.toString())
 
     private val maxTokensField: JTextField = JTextField(service<OpenAISetting>().openAiState.maxTokens.toString())
 
-    init {
-        tokenField.text = service<OpenAISetting>().getApiToken()
-    }
+    private val mainPanel = JPanel(BorderLayout())
 
     private val panel: JPanel =
 
@@ -36,44 +39,24 @@ class OpenAIUi {
             .panel
 
 
-    fun getComponent(): JPanel {
-        return panel
+    init {
+        tokenField.text = service<OpenAISetting>().getApiToken()
+        mainPanel.add(panel, BorderLayout.NORTH)
     }
 
-    var token
-        set(value) {
-            tokenField.text = value
-        }
-        get() = String(tokenField.password)
+    fun getComponent(): JPanel {
+        return mainPanel
+    }
 
-    var currentModel : AvailableOpenAIModels
-        set(value) {
-            currentModelComboBox.selectedItem = value
-        }
-        get() = currentModelComboBox.selectedItem as AvailableOpenAIModels
+    fun token(): String {
+        return String(tokenField.password)
+    }
 
-    var temperature: Double
-        set(value) {
-            temperatureField.text = value.toString()
-        }
-        get() = temperatureField.text.toDouble()
-
-    var maxTokens
-        set(value) {
-            maxTokensField.text = value.toString()
-        }
-        get() = maxTokensField.text.toInt()
-
-    var currentState: OpenAISetting.State
-        get() = OpenAISetting.State().apply {
+    fun currentState(): OpenAISetting.State {
+        return OpenAISetting.State().apply {
             currentModel = currentModelComboBox.selectedItem as AvailableOpenAIModels
             temperature = temperatureField.text.toDouble()
             maxTokens = maxTokensField.text.toInt()
         }
-        set(value) {
-            currentModel = value.currentModel
-            temperature = value.temperature
-            maxTokens = value.maxTokens
-        }
-
+    }
 }

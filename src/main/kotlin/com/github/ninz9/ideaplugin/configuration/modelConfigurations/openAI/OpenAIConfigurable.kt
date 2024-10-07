@@ -8,23 +8,27 @@ class OpenAIConfigurable: Configurable {
 
     private val openUiComponent = OpenAIUi()
 
-    override fun getDisplayName(): String? {
+    override fun getDisplayName(): String {
         return "OpenAISettings"
     }
 
     override fun isModified(): Boolean {
-        return this.openUiComponent.currentState != service<OpenAISetting>().openAiState
-                || this.openUiComponent.token != service<OpenAISetting>().getApiToken()
-        return false
+        return this.openUiComponent.currentState() != service<OpenAISetting>().openAiState
+                || this.openUiComponent.token() != service<OpenAISetting>().getApiToken()
     }
 
-    override fun createComponent(): JComponent? {
+    override fun createComponent(): JComponent {
         return openUiComponent.getComponent()
     }
 
     override fun apply() {
-        service<OpenAISetting>().loadState(openUiComponent.currentState)
-        service<OpenAISetting>().saveApiToken(openUiComponent.token)
+        val currentState = openUiComponent.currentState()
+        val token = openUiComponent.token()
+
+        if (currentState.currentModel != service<OpenAISetting>().openAiState.currentModel)
+            service<OpenAISetting>().loadState(currentState)
+        if (token != service<OpenAISetting>().getApiToken())
+             service<OpenAISetting>().saveApiToken(openUiComponent.token())
     }
 }
 

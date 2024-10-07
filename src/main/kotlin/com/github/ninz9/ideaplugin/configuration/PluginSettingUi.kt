@@ -1,14 +1,21 @@
-package com.github.ninz9.ideaplugin.ui.configUiComponents
+package com.github.ninz9.ideaplugin.configuration
 
+import com.github.ninz9.ideaplugin.configuration.modelConfigurations.anthropic.AnthropicConfigurable
+import com.github.ninz9.ideaplugin.configuration.modelConfigurations.openAI.OpenAIConfigurable
 import com.github.ninz9.ideaplugin.llm.AiModel
-import com.github.ninz9.ideaplugin.configuration.PluginSettings
+import com.intellij.ide.DataManager
 import com.intellij.openapi.components.service
+import com.intellij.openapi.options.Configurable
+import com.intellij.openapi.options.ex.Settings
 import com.intellij.openapi.ui.ComboBox
+import com.intellij.ui.components.ActionLink
 import javax.swing.JComponent
 import com.intellij.util.ui.FormBuilder
+import java.awt.BorderLayout
+import javax.swing.JPanel
 
 
-class PluginSettingComponent {
+class PluginSettingUi {
 
     private var currentVendorComboBox: ComboBox<AiModel> =
         ComboBox(AiModel.entries.toTypedArray()).apply {
@@ -16,8 +23,8 @@ class PluginSettingComponent {
         }
 
 //    private var vendorSettingsLinks = mapOf(
-//        "OpenAI" to OpenAIConfigurable::class.java as Configurable,
-//        "Anthropic" to AnthropicConfigurable::class.java as  Configurable
+//        "OpenAI" to OpenAIConfigurable::class.java ,
+//        "Anthropic" to AnthropicConfigurable::class.java
 //    ).entries.forEach { (vendor, cls) ->
 //        ActionLink(vendor, {
 //            val context = service<DataManager>().getDataContext(it.source as ActionLink)
@@ -26,6 +33,15 @@ class PluginSettingComponent {
 //        })
 //    }
 
+    private val panel = FormBuilder.createFormBuilder()
+        .addLabeledComponent("Current model", currentVendorComboBox)
+        .panel
+
+    private val mainPanel = JPanel(BorderLayout())
+
+    init {
+        mainPanel.add(panel, BorderLayout.NORTH)
+    }
 
     fun getSelectedVendor(): AiModel {
         return currentVendorComboBox.selectedItem as AiModel
@@ -36,10 +52,7 @@ class PluginSettingComponent {
     }
 
     fun getComponent(): JComponent {
-        return FormBuilder.createFormBuilder()
-            .addLabeledComponent("Current model", currentVendorComboBox)
-            .panel
+        return mainPanel
     }
-
 }
 
