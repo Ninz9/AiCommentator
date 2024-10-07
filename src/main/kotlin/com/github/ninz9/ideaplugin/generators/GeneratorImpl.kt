@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 class GeneratorImpl : Generator {
 
     override suspend fun generateCommentForFunction(element: PsiElement): String {
-        val model = ModelFactoryWithSimplePromptGenerator().getModel()
+        val model = ModelFactory().getModel()
         val codeStructure = analyzeElement(element)
         val messages = service<PromptGenerator>().generatePromptForMethod(codeStructure)
 
@@ -23,7 +23,7 @@ class GeneratorImpl : Generator {
     override suspend fun generateCommentForClass(element: PsiElement): String {
         val codeStructure = analyzeElement(element)
         val messages = service<PromptGenerator>().generatePromptForClass(codeStructure)
-        val model = ModelFactoryWithSimplePromptGenerator().getModel()
+        val model = ModelFactory().getModel()
 
         return model.sendRequest(messages)
     }
@@ -31,7 +31,7 @@ class GeneratorImpl : Generator {
     override suspend fun generateCommentForFunctionStream(element: PsiElement): Flow<String> {
         val codeStructure = analyzeElement(element)
         val messages = service<PromptGenerator>().generatePromptForMethod(codeStructure)
-        val model = ModelFactoryWithSimplePromptGenerator().getModel()
+        val model = ModelFactory().getModel()
 
         return model.sendRequestStream(messages)
     }
@@ -39,7 +39,7 @@ class GeneratorImpl : Generator {
     override suspend fun generateCommentForClassStream(element: PsiElement): Flow<String> {
         val codeStructure = analyzeElement(element)
         val messages = service<PromptGenerator>().generatePromptForClass(codeStructure)
-        val model = ModelFactoryWithSimplePromptGenerator().getModel()
+        val model = ModelFactory().getModel()
 
         return model.sendRequestStream(messages)
     }

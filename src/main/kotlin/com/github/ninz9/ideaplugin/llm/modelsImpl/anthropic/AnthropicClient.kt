@@ -11,13 +11,13 @@ import org.json.JSONObject
 
 class AnthropicClient(
     private val token: String,
-    private val model: String,
+    private val model: AvailableAnthropicModels,
     private val maxTokens: Int,
-    private val temperature: Float
+    private val temperature: Double
 ): LLMClient {
 
 
-    val url = "https://api.anthropic.com/v1/messages"
+    private val url = "https://api.anthropic.com/v1/messages"
 
     override suspend fun sendRequestStream(messages: Collection<ModelMessage>): Flow<String> {
         TODO("Not yet implemented")
@@ -56,7 +56,7 @@ class AnthropicClient(
             }
         }
         json.put("messages", messagesJson)
-        json.put("model", model)
+        json.put("model", model.modelName)
         json.put("max_tokens", maxTokens)
         json.put("temperature", temperature)
         json.put("stream", stream)
