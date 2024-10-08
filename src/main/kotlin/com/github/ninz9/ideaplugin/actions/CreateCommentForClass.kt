@@ -24,7 +24,7 @@ class CreateCommentForClass : AnAction() {
         val clazz = psiManipulator.getCaretClass(editor.caretModel.offset, file) ?: return
 
         CoroutineScope(Dispatchers.IO).launch {
-            val comment = service<GeneratorImpl>().generateCommentForFunction(clazz)
+            val comment = service<GeneratorImpl>().generateCommentForClass(clazz)
             psiManipulator.insertCommentBeforeElement(project, clazz, comment)
         }
     }

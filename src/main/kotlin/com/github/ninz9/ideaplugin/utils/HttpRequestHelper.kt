@@ -6,11 +6,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import java.io.BufferedReader
 import kotlin.collections.component1
 import kotlin.collections.component2
 import kotlin.collections.iterator
@@ -28,25 +30,41 @@ class HttpRequestHelper() {
     ): Flow<T> {
 
         val request = buildRequest(url, jsonBody, headers)
-        val call = client.newCall(request)
+        val tmp = client.newCall(request)
 
-        return callbackFlow {
-            call.enqueue(object : okhttp3.Callback {
-                override fun onFailure(call: okhttp3.Call, e: java.io.IOException) {
-                    close(e)
-                }
+        return flow {
 
-                override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-                    val source = response.body?.source()
-                    if (source != null) {
-                        val buffer = source.buffer
-                        val json = buffer.readUtf8()
-                        val obj = Gson().fromJson(json, responseType)
-                        trySend(obj)
+            val response = tmp.execute()
+
+            if (!response.isSuccessful) throw Exception("Unexpected response code: ${response.code}")
+
+            response.body?.use { responseBody ->
+                val source = responseBody.source()
+                val reader = BufferedReader(source.inputStream().reader())
+               var lineCount = 0
+                try {
+                    while (!source.exhausted()) {
+                        val line = reader.readLine() ?: break
+
+                        // Обработка только полезных данных
+                        if (line.startsWith("data:") && line != "data: [DONE]") {
+                            val data = line.substringAfter("data: ")
+                            val parsedData = Gson().fromJson(data, responseType)
+
+
+                            emit(parsedData)
+                        }
                     }
+                } catch (e: Exception) {
+
+                    println("Error while reading stream: ${e.message}")
+                } finally {
+                    reader.close()
                 }
-            })
+            }
         }
+
+
     }
 
     fun <T, E> post(
@@ -61,7 +79,7 @@ class HttpRequestHelper() {
         val response = client.newCall(request).execute()
         val body = response.body?.string()
 
-        when(response.code) {
+        when (response.code) {
             in 200..299 -> {
                 val data = Gson().fromJson(body, responseType)
                 return ApiResponse.Success(data)
@@ -70,13 +88,18 @@ class HttpRequestHelper() {
                 val error = Gson().fromJson(body, errorType)
                 return ApiResponse.Error(error)
             }
+
             else -> {
                 throw Exception("Unexpected response code: ${response.code}")
             }
         }
     }
 
-    private fun buildRequest(url: String, jsonBody: JSONObject, headers: Map<String, String> = emptyMap()): Request {
+    private fun buildRequest(
+        url: String,
+        jsonBody: JSONObject,
+        headers: Map<String, String> = emptyMap()
+    ): Request {
         val mediaType = "application/json; charset=utf-8".toMediaTypeOrNull()
         val body = jsonBody.toString().toRequestBody(mediaType)
         val requestBuilder = Request.Builder()

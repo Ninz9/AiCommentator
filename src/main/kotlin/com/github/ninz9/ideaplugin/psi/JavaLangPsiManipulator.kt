@@ -40,7 +40,7 @@ class JavaLangPsiManipulator : PsiManipulator {
     }
 
 
-    override fun createCommentElement(project: Project): PsiElement? {
+    override fun createCommentElement(project: Project, element: PsiElement): PsiElement {
         TODO("Not yet implemented")
     }
 

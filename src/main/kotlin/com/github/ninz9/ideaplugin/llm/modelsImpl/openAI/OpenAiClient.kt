@@ -38,15 +38,16 @@ class OpenAiClient(
 //            it.choices.first().delta?.content ?: ""
 //        }.flowOn(Dispatchers.IO)
 
-            return HttpRequestHelper().stream(
-                url,
-                requestBody,
-                mapOf("Authorization" to authHeader),
-                StreamOpenAiResponse::class.java
-            ).map {
-                it.choices.first().delta.content
-            }.flowOn(Dispatchers.IO).buffer()
+        return HttpRequestHelper().stream(
+            url,
+            requestBody,
+            mapOf("Authorization" to authHeader),
+            StreamOpenAiResponse::class.java
+        ).map {
+            it.choices.first().delta?.content ?: "HHH"
+        }
     }
+
 
     override suspend fun sendRequest(messages: Collection<ModelMessage>): String {
 

@@ -24,7 +24,9 @@ interface PsiManipulator {
 
     fun insertCommentBeforeElement(project: Project, element: PsiElement, comment: String)
 
-    fun createCommentElement(project: Project): PsiElement?
+    fun createCommentElement(project: Project, element: PsiElement): PsiElement?
 
     fun addTextChunkToComment(project: Project, comment: PsiElement, text: String)
+
+
 }

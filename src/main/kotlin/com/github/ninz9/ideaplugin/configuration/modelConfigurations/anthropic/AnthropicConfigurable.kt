@@ -13,7 +13,6 @@ class AnthropicConfigurable : Configurable {
     }
 
     override fun isModified(): Boolean {
-
         return this.uiComponent.currentState() != service<AnthropicSetting>().state
                 || this.uiComponent.token() != service<AnthropicSetting>().getApiToken()
     }

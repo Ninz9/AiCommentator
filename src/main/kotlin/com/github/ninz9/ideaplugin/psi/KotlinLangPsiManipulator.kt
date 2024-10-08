@@ -5,6 +5,7 @@ import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project
 import com.intellij.psi.*
+import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.util.PsiTreeUtil
 import org.jetbrains.kotlin.psi.KtNamedFunction
 import org.jetbrains.kotlin.psi.KtClass
@@ -39,27 +40,54 @@ class KotlinLangPsiManipulator : PsiManipulator {
         }
     }
 
-    override fun createCommentElement(project: Project): PsiElement? {
+    override fun createCommentElement(project: Project, element: PsiElement): PsiElement? {
         val factory = KtPsiFactory(project)
-        var element: PsiElement? = null
+        var comment: PsiComment? = null
         WriteCommandAction.runWriteCommandAction(project) {
-            element = factory.createComment("")
+            comment = factory.createComment("/** \n * \n */")
+            val parent = element.parent
+            if (parent.containingFile != null && parent != null)
+                parent.addBefore(comment!!, element)
         }
-        return element
+        return comment
+
+//        val factory = KtPsiFactory(project)
+//        WriteCommandAction.runWriteCommandAction(project) {
+//
+//            val newComment = factory.createComment("/** \n * \n */")
+//            val parent = element.parent
+//            parent.addBefore(newComment, element)
+//
+//        }
+
+
     }
+
 
     override fun addTextChunkToComment(
         project: Project,
-        comment: PsiElement,
+        element: PsiElement,
         text: String
     ) {
-        val factory = KtPsiFactory(project)
-        val prevText = comment.readText().replace("//", "").replace("/*", "").replace("*/", "")
+//        val factory = KtPsiFactory(project)
+//
+//        WriteCommandAction.runWriteCommandAction(project) {
+//            val prevText = comment.readText().replace("/**", "").replace("*/", "").replace("*", "")
+//            val newText = "//* \n* $prevText $text */"
+//            val textElement = factory.createComment(newText)
+//            comment.replace(textElement)
+//        }
 
-        val newText = "$prevText $text"
+        val factory = KtPsiFactory(project)
         WriteCommandAction.runWriteCommandAction(project) {
-            val textElement = factory.createComment(newText)
-            comment.replace(textElement)
+
+            val newComment = factory.createComment(text)
+            element.replace(newComment)
+
+            val parent = element.parent
+            CodeStyleManager.getInstance(project).reformat(parent)
         }
+
     }
 }
+
