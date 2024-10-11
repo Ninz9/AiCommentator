@@ -4,9 +4,12 @@ import com.github.ninz9.ideaplugin.utils.types.ModelMessage
 import com.github.ninz9.ideaplugin.llm.LLMClient
 import com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic.data.error.AnthropicErrorResponse
 import com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic.data.post.AnthropicResponse
+import com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic.data.stream.AnthropicStreamResponse
 import com.github.ninz9.ideaplugin.utils.ApiResponse
 import com.github.ninz9.ideaplugin.utils.HttpRequestHelper
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import org.json.JSONObject
 
 class AnthropicClient(
@@ -20,7 +23,25 @@ class AnthropicClient(
     private val url = "https://api.anthropic.com/v1/messages"
 
     override suspend fun sendRequestStream(messages: Collection<ModelMessage>): Flow<String> {
-        TODO("Not yet implemented")
+        val requestBody = buildJsonRequestBody(messageAdapter(messages), true)
+        val headers = mapOf(
+            "anthropic-version" to "2023-06-01",
+            "x-api-key" to token,
+            "content-Type" to "application/json"
+        )
+
+        val response =  HttpRequestHelper().stream(
+            url,
+            requestBody,
+            headers,
+            AnthropicStreamResponse::class.java
+        )
+
+        return response.filter {
+            it.type == "content_block_delta" || it.type == "content_block_start"
+        }.map {
+            it?.delta?.text ?: ""
+        }
     }
 
     override suspend fun sendRequest(messages: Collection<ModelMessage>): String {
