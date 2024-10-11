@@ -1,6 +1,9 @@
-package com.github.ninz9.ideaplugin.validators
+package com.github.ninz9.ideaplugin.formatters
 
-class JavaDocValidator: Validator {
+import com.intellij.openapi.components.Service
+
+@Service()
+class JavaDocFormatter: Formatter {
     private val JAVADOC_PATTERN = Regex(
         "/\\*\\*\\s*" +        // Start of JavaDoc comment
                 "(\\*\\s*.*\\s*)*" +   // Any number of lines starting with *
@@ -11,6 +14,15 @@ class JavaDocValidator: Validator {
     private val PARAM_PATTERN = Regex("@param\\s+(\\w+)\\s+")
     private val RETURN_PATTERN = Regex("@return\\s+")
     private val THROWS_PATTERN = Regex("@throws\\s+(\\w+)\\s+")
+
+    override val newLineTags: Set<String>
+        get() = TODO("Not yet implemented")
+    override val linePrefix: String
+        get() = TODO("Not yet implemented")
+    override val commentPrefix: String
+        get() = TODO("Not yet implemented")
+    override val commentSuffix: String
+        get() = TODO("Not yet implemented")
 
     /**
      * Checks if the given string is a valid JavaDoc comment.
@@ -72,14 +84,20 @@ class JavaDocValidator: Validator {
      */
     override fun isValidDoc(
         doc: String,
-        paramNames: List<String>,
-        hasReturnValue: Boolean,
-        exceptionNames: List<String>
+//        paramNames: List<String>,
+//        hasReturnValue: Boolean,
+//        exceptionNames: List<String>
     ): Boolean {
-        return isValidJavaDoc(doc) &&
-                hasAllParamsDocumented(doc, paramNames) &&
-                hasReturnDocumented(doc, hasReturnValue) &&
-                hasAllExceptionsDocumented(doc, exceptionNames)
+        return isValidJavaDoc(doc)
+
+//             &&   hasAllParamsDocumented(doc, paramNames) &&
+//                hasReturnDocumented(doc, hasReturnValue) &&
+//                hasAllExceptionsDocumented(doc, exceptionNames)
+    }
+
+
+    override fun formatDoc(doc: String, maxLineLength: Int): String {
+        TODO("Not yet implemented")
     }
 }
 
