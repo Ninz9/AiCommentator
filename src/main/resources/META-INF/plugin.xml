@@ -14,9 +14,14 @@
     <actions>
         <group id="com.github.ninz9.ideaplugin.actions">
             <separator/>
-                <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForFunction" id="CreateCommentForFunction" text="Generate Comment for Method"/>
-            <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForClass" id="CreateCommentForClass" text="Create Comment for Class"/>
-             <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForClassStream" id="CreateCommentForClassStream" text="Create Comment for Class Stream"/>
+            <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForFunction" id="CreateCommentForFunction"
+                    text="Generate Comment for Method"/>
+            <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForClass" id="CreateCommentForClass"
+                    text="Create Comment for Class"/>
+            <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForClassStream"
+                    id="CreateCommentForClassStream" text="Create Comment for Class Stream"/>
+            <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForMethodStream"
+                    id="CreateCommentForMethodStream" text="Create Comment for Method Stream"/>
             <separator/>
             <add-to-group group-id="EditorPopupMenu" anchor="first"/>
         </group>
@@ -27,8 +32,10 @@
     <extensions defaultExtensionNs="com.intellij">
 
         <applicationService serviceImplementation="com.github.ninz9.ideaplugin.configuration.PluginSettings"/>
-        <applicationService serviceImplementation="com.github.ninz9.ideaplugin.configuration.modelConfigurations.openAI.OpenAISetting"/>
-        <applicationService serviceImplementation="com.github.ninz9.ideaplugin.configuration.modelConfigurations.anthropic.AnthropicSetting"/>
+        <applicationService
+                serviceImplementation="com.github.ninz9.ideaplugin.configuration.modelConfigurations.openAI.OpenAISetting"/>
+        <applicationService
+                serviceImplementation="com.github.ninz9.ideaplugin.configuration.modelConfigurations.anthropic.AnthropicSetting"/>
 
         <applicationConfigurable
                 parentId="tools"
@@ -37,11 +44,11 @@
                 displayName="Idea Plugin"
                 nonDefaultProject="true"/>
         <applicationConfigurable
-            parentId="com.github.ninz9.ideaplugin.setting.ProjectSettingsConfigurable"
-            instance="com.github.ninz9.ideaplugin.configuration.modelConfigurations.openAI.OpenAIConfigurable"
-            id="com.github.ninz9.ideaplugin.setting.modelConfigurations.openai.OpenAIConfigurable"
-            displayName="OpenAI Configuration"
-            nonDefaultProject="true"/>
+                parentId="com.github.ninz9.ideaplugin.setting.ProjectSettingsConfigurable"
+                instance="com.github.ninz9.ideaplugin.configuration.modelConfigurations.openAI.OpenAIConfigurable"
+                id="com.github.ninz9.ideaplugin.setting.modelConfigurations.openai.OpenAIConfigurable"
+                displayName="OpenAI Configuration"
+                nonDefaultProject="true"/>
         <applicationConfigurable
                 parentId="com.github.ninz9.ideaplugin.setting.ProjectSettingsConfigurable"
                 instance="com.github.ninz9.ideaplugin.configuration.modelConfigurations.anthropic.AnthropicConfigurable"
@@ -52,7 +59,7 @@
 
     </extensions>
 
-<!--    <applicationListeners>-->
-<!--        <listener class="com.github.ninz9.ideaplugin.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>-->
-<!--    </applicationListeners>-->
+    <!--    <applicationListeners>-->
+    <!--        <listener class="com.github.ninz9.ideaplugin.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>-->
+    <!--    </applicationListeners>-->
 </idea-plugin>
