@@ -1,5 +1,6 @@
 package com.github.ninz9.ideaplugin.psi
 
+import com.github.ninz9.ideaplugin.utils.types.MethodStructure
 import com.intellij.openapi.editor.Editor
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement

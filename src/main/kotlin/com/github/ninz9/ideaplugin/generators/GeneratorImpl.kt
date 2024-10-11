@@ -2,7 +2,8 @@ package com.github.ninz9.ideaplugin.generators
 
 import com.github.ninz9.ideaplugin.llm.ModelFactory
 import com.github.ninz9.ideaplugin.generators.promptGenerators.PromptGenerator
-import com.github.ninz9.ideaplugin.utils.readText
+import com.github.ninz9.ideaplugin.utils.types.MethodStructure
+import com.github.ninz9.ideaplugin.formatters.FormatterFactory
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.psi.PsiElement

@@ -1,7 +1,7 @@
 package com.github.ninz9.ideaplugin.llm.modelsImpl.openAI
 
 import com.github.ninz9.ideaplugin.llm.LLMClient
-import com.github.ninz9.ideaplugin.generators.ModelMessage
+import com.github.ninz9.ideaplugin.utils.types.ModelMessage
 import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.error.OpenAiErrorResponse
 import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.post.OpenAIResponse
 import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.stream.StreamOpenAiResponse

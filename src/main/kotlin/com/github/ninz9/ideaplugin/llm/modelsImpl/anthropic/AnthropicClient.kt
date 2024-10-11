@@ -1,6 +1,6 @@
 package com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic
 
-import com.github.ninz9.ideaplugin.generators.ModelMessage
+import com.github.ninz9.ideaplugin.utils.types.ModelMessage
 import com.github.ninz9.ideaplugin.llm.LLMClient
 import com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic.data.error.AnthropicErrorResponse
 import com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic.data.post.AnthropicResponse

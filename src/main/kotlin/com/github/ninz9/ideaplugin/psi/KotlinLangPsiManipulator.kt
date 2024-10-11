@@ -1,6 +1,7 @@
 package com.github.ninz9.ideaplugin.psi
 
-import com.github.ninz9.ideaplugin.utils.readText
+import com.github.ninz9.ideaplugin.utils.types.MethodStructure
+import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.project.Project

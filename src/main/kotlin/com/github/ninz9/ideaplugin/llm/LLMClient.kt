@@ -1,6 +1,6 @@
 package com.github.ninz9.ideaplugin.llm
 
-import com.github.ninz9.ideaplugin.generators.ModelMessage
+import com.github.ninz9.ideaplugin.utils.types.ModelMessage
 import kotlinx.coroutines.flow.Flow
 
 interface LLMClient {

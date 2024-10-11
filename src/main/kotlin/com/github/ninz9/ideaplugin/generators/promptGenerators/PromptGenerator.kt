@@ -1,7 +1,7 @@
 package com.github.ninz9.ideaplugin.generators.promptGenerators
 
-import com.github.ninz9.ideaplugin.generators.CodeStructure
-import com.github.ninz9.ideaplugin.generators.ModelMessage
+import com.github.ninz9.ideaplugin.utils.types.MethodStructure
+import com.github.ninz9.ideaplugin.utils.types.ModelMessage
 import com.intellij.openapi.components.Service
 
 @Service

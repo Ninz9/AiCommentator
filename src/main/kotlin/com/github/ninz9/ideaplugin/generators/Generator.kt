@@ -1,6 +1,6 @@
 package com.github.ninz9.ideaplugin.generators
 
-import com.intellij.psi.PsiElement
+import com.github.ninz9.ideaplugin.utils.types.MethodStructure
 import kotlinx.coroutines.flow.Flow
 
 interface Generator {
