@@ -6,57 +6,49 @@ import com.github.ninz9.ideaplugin.utils.types.MethodStructure
 import com.github.ninz9.ideaplugin.formatters.FormatterFactory
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
-import com.intellij.psi.PsiElement
 import kotlinx.coroutines.flow.Flow
 
 @Service
 class GeneratorImpl : Generator {
 
-    override suspend fun generateCommentForFunction(element: PsiElement): String {
+    override suspend fun generateCommentForFunction(element: MethodStructure): String {
         val model = ModelFactory().getModel()
-        val codeStructure = analyzeElement(element)
-        val messages = service<PromptGenerator>().generatePromptForMethod(codeStructure)
+        val messages = service<PromptGenerator>().generatePromptForMethod(element)
 
-       val res = model.sendRequest(messages)
+        var res = model.sendRequest(messages)
+
+        while (isDocInvalid(element, res)) {
+            res = model.sendRequest(messages)
+            println("Invalid doc: $res")
+        }
         return res
     }
 
-    override suspend fun generateCommentForClass(element: PsiElement): String {
-        val codeStructure = analyzeElement(element)
-        val messages = service<PromptGenerator>().generatePromptForClass(codeStructure)
+    override suspend fun generateCommentForClass(element: MethodStructure): String {
+        val messages = service<PromptGenerator>().generatePromptForClass(element)
         val model = ModelFactory().getModel()
 
         return model.sendRequest(messages)
     }
 
-    override suspend fun generateCommentForFunctionStream(element: PsiElement): Flow<String> {
-        val codeStructure = analyzeElement(element)
-        val messages = service<PromptGenerator>().generatePromptForMethod(codeStructure)
+    override suspend fun generateCommentForFunctionStream(element: MethodStructure): Flow<String> {
+        val messages = service<PromptGenerator>().generatePromptForMethod(element)
         val model = ModelFactory().getModel()
 
         return model.sendRequestStream(messages)
     }
 
-    override suspend fun generateCommentForClassStream(element: PsiElement): Flow<String> {
-        val codeStructure = analyzeElement(element)
-        val messages = service<PromptGenerator>().generatePromptForClass(codeStructure)
+    override suspend fun generateCommentForClassStream(element: MethodStructure): Flow<String> {
+        val messages = service<PromptGenerator>().generatePromptForClass(element)
         val model = ModelFactory().getModel()
 
         return model.sendRequestStream(messages)
     }
 
-    private fun analyzeElement(element: PsiElement): CodeStructure {
-
-        val text = element.readText()
-        val codeStructure = CodeStructure(
-            code = text,
-            element.language.displayName,
-            calculateComplexity(text)
+    private fun isDocInvalid(methodStructure: MethodStructure, doc: String): Boolean {
+        val validator = FormatterFactory().getFormatter(methodStructure.language)
+        return !validator.isValidDoc(doc,
+           // methodStructure.paramNames, methodStructure.hasReturnValue, methodStructure.exceptionNames
         )
-        return codeStructure
-    }
-
-    private fun calculateComplexity(code: String): String {
-        return "Complexity"
     }
 }

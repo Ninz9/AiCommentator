@@ -5,11 +5,11 @@ import kotlinx.coroutines.flow.Flow
 
 interface Generator {
 
-    suspend fun generateCommentForFunction(code: PsiElement): String
+    suspend fun generateCommentForFunction(code: MethodStructure): String
 
-    suspend fun generateCommentForClass(code: PsiElement): String
+    suspend fun generateCommentForClass(code: MethodStructure): String
 
-    suspend fun generateCommentForFunctionStream(code: PsiElement): Flow<String>
+    suspend fun generateCommentForFunctionStream(code: MethodStructure): Flow<String>
 
-    suspend fun generateCommentForClassStream(code: PsiElement): Flow<String>
+    suspend fun generateCommentForClassStream(code: MethodStructure): Flow<String>
 }

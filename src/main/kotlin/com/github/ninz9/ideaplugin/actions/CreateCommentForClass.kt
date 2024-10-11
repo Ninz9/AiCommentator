@@ -4,6 +4,7 @@ import com.github.ninz9.ideaplugin.generators.GeneratorImpl
 import com.github.ninz9.ideaplugin.psi.LangManipulatorFactory
 import com.github.ninz9.ideaplugin.utils.getEditor
 import com.github.ninz9.ideaplugin.utils.getFile
+import com.github.ninz9.ideaplugin.formatters.FormatterFactory
 import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -11,6 +12,7 @@ import com.intellij.openapi.components.service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CreateCommentForClass : AnAction() {
 
@@ -20,8 +22,9 @@ class CreateCommentForClass : AnAction() {
         val file = event.getFile() ?: return
 
         val psiManipulator = service<LangManipulatorFactory>().getLangManipulator(event)
-
         val clazz = psiManipulator.getCaretClass(editor.caretModel.offset, file) ?: return
+        val codeStructure = psiManipulator.analyzePsiClass(clazz) ?: return
+
 
         CoroutineScope(Dispatchers.IO).launch {
             val codeFormatter = service<FormatterFactory>().getFormatter(codeStructure.language)

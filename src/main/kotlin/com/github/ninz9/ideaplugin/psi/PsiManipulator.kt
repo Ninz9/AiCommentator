@@ -29,5 +29,11 @@ interface PsiManipulator {
 
     fun addTextChunkToComment(project: Project, comment: PsiElement, text: String)
 
+    fun analyzePsiMethod(element: PsiElement): MethodStructure?
 
+    fun analyzePsiClass(element: PsiElement): MethodStructure?
+
+    fun replaceCommentText(project: Project, element: PsiElement, text: String)
+
+    fun deleteElementComment(project: Project, element: PsiElement)
 }

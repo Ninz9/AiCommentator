@@ -7,10 +7,7 @@ import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.post.OpenAIRespons
 import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.stream.StreamOpenAiResponse
 import com.github.ninz9.ideaplugin.utils.ApiResponse
 import com.github.ninz9.ideaplugin.utils.HttpRequestHelper
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.buffer
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import org.json.JSONObject
 
@@ -44,7 +41,7 @@ class OpenAiClient(
             mapOf("Authorization" to authHeader),
             StreamOpenAiResponse::class.java
         ).map {
-            it.choices.first().delta?.content ?: "HHH"
+            it.choices.first().delta?.content ?: ""
         }
     }
 

@@ -53,4 +53,50 @@ class JavaLangPsiManipulator : PsiManipulator {
     ) {
         TODO("Not yet implemented")
     }
+
+    override fun analyzePsiMethod(element: PsiElement): MethodStructure? {
+        if (element !is PsiMethod) return null
+
+        return ApplicationManager.getApplication().runReadAction<MethodStructure> {
+            MethodStructure(
+                code = element.text,
+                language = element.language.displayName,
+                complexity = "Complexity",
+                paramNames = element.parameterList.parameters.map { it.name },
+                hasReturnValue = element.returnType != null,
+                exceptionNames = element.throwsList.referenceElements.map { it.text },
+            )
+        }
+    }
+
+    override fun analyzePsiClass(element: PsiElement): MethodStructure? {
+        if (element !is PsiClass) return null
+
+        return ApplicationManager.getApplication().runReadAction<MethodStructure> {
+            MethodStructure(
+                code = element.text,
+                language = element.language.displayName,
+                complexity = "Complexity",
+                paramNames = emptyList(),
+                hasReturnValue = false,
+                exceptionNames = emptyList(),
+            )
+        }
+        //TODO: Implement
+    }
+
+    override fun replaceCommentText(
+        project: Project,
+        element: PsiElement,
+        text: String
+    ) {
+        TODO("Not yet implemented")
+    }
+
+    override fun deleteElementComment(
+        project: Project,
+        element: PsiElement
+    ) {
+        TODO("Not yet implemented")
+    }
 }
