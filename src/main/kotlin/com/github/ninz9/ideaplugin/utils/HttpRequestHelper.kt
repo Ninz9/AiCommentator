@@ -2,10 +2,7 @@ package com.github.ninz9.ideaplugin.utils
 
 import com.google.gson.Gson
 import com.intellij.openapi.components.Service
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
@@ -41,17 +38,13 @@ class HttpRequestHelper() {
             response.body?.use { responseBody ->
                 val source = responseBody.source()
                 val reader = BufferedReader(source.inputStream().reader())
-               var lineCount = 0
                 try {
                     while (!source.exhausted()) {
                         val line = reader.readLine() ?: break
 
-                        // Обработка только полезных данных
                         if (line.startsWith("data:") && line != "data: [DONE]") {
                             val data = line.substringAfter("data: ")
                             val parsedData = Gson().fromJson(data, responseType)
-
-
                             emit(parsedData)
                         }
                     }
@@ -88,7 +81,6 @@ class HttpRequestHelper() {
                 val error = Gson().fromJson(body, errorType)
                 return ApiResponse.Error(error)
             }
-
             else -> {
                 throw Exception("Unexpected response code: ${response.code}")
             }
@@ -113,7 +105,6 @@ class HttpRequestHelper() {
         return requestBuilder.build()
     }
 }
-
 
 sealed class ApiResponse<out T, out E> {
     data class Success<T>(val data: T) : ApiResponse<T, Nothing>()

@@ -15,14 +15,13 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class CreateCommentForFunction : AnAction() {
-    //TODO: check code complexety and understandable
+
     override fun actionPerformed(event: AnActionEvent) {
         val editor = event.getEditor() ?: return
         val project = event.project ?: return
         val file = event.getFile() ?: return
 
         val psiManipulator = service<LangManipulatorFactory>().getLangManipulator(event)
-
         val method = psiManipulator.getCaretMethod(editor.caretModel.offset, file) ?: return
         val codeStructure = psiManipulator.analyzePsiMethod(method) ?: return
 

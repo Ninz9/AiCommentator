@@ -1,7 +1,7 @@
 package com.github.ninz9.ideaplugin.utils
 
+import com.github.ninz9.ideaplugin.formatters.FormatterFactory
 import com.github.ninz9.ideaplugin.psi.PsiManipulator
-import com.github.ninz9.ideaplugin.formatters.KotlinDocFormatter
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
@@ -24,10 +24,11 @@ suspend fun renderValidCommentGradually(
     psiManipulator: PsiManipulator,
     commentFlow: Flow<String>,
     project: Project,
-    element: PsiElement
+    element: PsiElement,
+    language: String
 ) {
     var accumulatedComment = ""
-
+    val formatter = service<FormatterFactory>().getFormatter(language)
 
     commentFlow
         .onEach { chunk ->
@@ -36,7 +37,7 @@ suspend fun renderValidCommentGradually(
         .buffer(capacity = Channel.UNLIMITED)
         .sample(100.milliseconds)
         .onEach {
-            val formattedComment = service<KotlinDocFormatter>().formatDoc(accumulatedComment)
+            val formattedComment = formatter.formatDoc(accumulatedComment)
             withContext(Dispatchers.Main) {
                 psiManipulator.insertCommentBeforeElement(project, element, formattedComment)
             }
@@ -45,7 +46,7 @@ suspend fun renderValidCommentGradually(
             println("Error in comment processing: ${e.message}")
         }
         .onCompletion {
-            val finalComment = service<KotlinDocFormatter>().formatDoc(accumulatedComment)
+            val finalComment = formatter.formatDoc(accumulatedComment)
             withContext(Dispatchers.Main) {
                 psiManipulator.insertCommentBeforeElement(project, element, finalComment)
             }

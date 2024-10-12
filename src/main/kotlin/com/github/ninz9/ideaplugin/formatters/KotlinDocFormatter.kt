@@ -3,66 +3,68 @@ package com.github.ninz9.ideaplugin.formatters
 import com.intellij.openapi.components.Service
 
 @Service()
-class KotlinDocFormatter: Formatter {
+class KotlinDocFormatter : Formatter {
 
     private val KDOC_PATTERN = Regex(
-                "/\\*\\*\\s*" +        // Start of KDoc comment
+        "/\\*\\*\\s*" +        // Start of KDoc comment
                 "(\\*\\s*.*\\s*)*" +   // Any number of lines starting with *
                 "\\*/",                // End of KDoc comment
         RegexOption.DOT_MATCHES_ALL
     )
 
-    private val PARAM_PATTERN = Regex("@param\\s+(\\w+)\\s+")
-    private val RETURN_PATTERN = Regex("@return\\s+")
-    private val THROWS_PATTERN = Regex("@throws\\s+(\\w+)\\s+")
+    override val newLineTags: Set<String> =
+        setOf("@param", "@return", "@throws", "@exception", "@see", "@since", "@deprecated", "@property")
 
-    override val linePrefix: String
-        get() = "*"
-    override val commentPrefix: String
-        get() = "/**"
-    override val commentSuffix: String
-        get() = "*/"
+
+    private val paramPattern = Regex("@param\\s+(\\w+)\\s+")
+    private val returnPattern = Regex("@return\\s+")
+    private val throwsPattern = Regex("@throws\\s+(\\w+)\\s+")
+    private val propertiesPattern = Regex("@property\\s+(\\w+)\\s+")
+
+    override val linePrefix = "*"
+    override val commentPrefix = "/**"
+    override val commentSuffix = "*/"
 
     private fun isValidKDoc(comment: String): Boolean {
         return KDOC_PATTERN.matches(comment)
     }
 
-
     private fun hasAllParamsDocumented(kdoc: String, paramNames: List<String>): Boolean {
-        val documentedParams = PARAM_PATTERN.findAll(kdoc).map { it.groupValues[1] }.toSet()
+        val documentedParams = paramPattern.findAll(kdoc).map { it.groupValues[1] }.toSet()
         return paramNames.all { it in documentedParams }
     }
 
-
     private fun hasReturnDocumented(kdoc: String, hasReturnValue: Boolean): Boolean {
         return if (hasReturnValue) {
-            RETURN_PATTERN.containsMatchIn(kdoc)
+            returnPattern.containsMatchIn(kdoc)
         } else {
             true // No @return needed for Unit/void methods
         }
     }
 
-
     fun hasAllExceptionsDocumented(kdoc: String, exceptionNames: List<String>): Boolean {
-        val documentedExceptions = THROWS_PATTERN.findAll(kdoc).map { it.groupValues[1] }.toSet()
+        val documentedExceptions = throwsPattern.findAll(kdoc).map { it.groupValues[1] }.toSet()
         return exceptionNames.all { it in documentedExceptions }
     }
 
-    override val newLineTags: Set<String> = setOf("@param", "@return", "@throws", "@exception", "@see", "@since", "@deprecated")
-
+    fun hasAllPropertiesDocumented(kdoc: String, propertyNames: List<String>): Boolean {
+        val documentedProperties = propertiesPattern.findAll(kdoc).map { it.groupValues[1] }.toSet()
+        return propertyNames.all { it in documentedProperties }
+    }
 
     override fun isValidDoc(
         doc: String,
-//        paramNames: List<String>,
-//        hasReturnValue: Boolean,
-//        exceptionNames: List<String>
+        paramNames: List<String>,
+        hasReturnValue: Boolean,
+        exceptionNames: List<String>,
+        propertyNames: List<String>
     ): Boolean {
-        return isValidKDoc(doc)
-//              &&  hasAllParamsDocumented(doc, paramNames) &&
-//                hasReturnDocumented(doc, hasReturnValue) &&
-//                hasAllExceptionsDocumented(doc, exceptionNames)
+        return isValidKDoc(doc) &&
+                hasAllParamsDocumented(doc, paramNames) &&
+                hasReturnDocumented(doc, hasReturnValue) &&
+                hasAllExceptionsDocumented(doc, exceptionNames) &&
+                hasAllPropertiesDocumented(doc, propertyNames)
     }
-
 }
 
 

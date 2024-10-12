@@ -9,9 +9,10 @@ interface Formatter {
 
     fun isValidDoc(
         doc: String,
-//                   paramNames: List<String>,
-//                   hasReturnValue: Boolean,
-//                   exceptionNames: List<String>
+        paramNames: List<String> = emptyList(),
+        hasReturnValue: Boolean = false,
+        exceptionNames: List<String> = emptyList(),
+        propertyNames: List<String> = emptyList()
     ): Boolean
 
 
@@ -23,32 +24,22 @@ interface Formatter {
         return assembleComment(formattedParagraphs)
     }
 
-//    private fun removeCommentMarkers(comment: String): String {
-//        val regex = Regex("""\s*\Q$linePrefix\E\s?""")  // Match any leading spaces and linePrefix (e.g., '*')
-//        val regex1 =
-//            Regex("""\Q$commentPrefix\E|\Q$commentSuffix\E""")  // Match any occurrence of commentPrefix or commentSuffix
-//
-//        return comment
-//            .replace(regex1, "")  // Remove all occurrences of commentPrefix (/**) and commentSuffix (*/)
-//            .replace(Regex("""\n+"""), " ")  // Replace newlines with spaces
-//            .replace(regex, "")  // Remove linePrefix (e.g., '*')
-//            .trim()
-//    }
-
     private fun removeCommentMarkers(comment: String): String {
-    val regex = Regex("""\s*\Q$linePrefix\E\s?""")  // Match any leading spaces and linePrefix (e.g., '*')
-    val regex1 = Regex("""\Q$commentPrefix\E|\Q$commentSuffix\E""")  // Match any occurrence of commentPrefix or commentSuffix
+        val regex = Regex("""\s*\Q$linePrefix\E\s?""")  // Match any leading spaces and linePrefix (e.g., '*')
+        val regex1 =
+            Regex("""\Q$commentPrefix\E|\Q$commentSuffix\E""")  // Match any occurrence of commentPrefix or commentSuffix
 
-    return comment
-        .replace(regex1, "")  // Remove all occurrences of commentPrefix (/**) and commentSuffix (*/)
-        .split("\n")  // Split the string into lines
-        .map { line ->
-            line.replace(regex, "").trim()  // Remove linePrefix and trim each line
-        }
-        .joinToString(" ")  // Join lines with a space
-        .replace(Regex("\\s+"), " ")  // Replace multiple spaces with a single space
-        .trim()
-}
+        return comment
+            .replace("```", "")
+            .replace(regex1, "")  // Remove all occurrences of commentPrefix (/**) and commentSuffix (*/)
+            .split("\n")  // Split the string into lines
+            .map { line ->
+                line.replace(regex, "").trim()  // Remove linePrefix and trim each line
+            }
+            .joinToString(" ")  // Join lines with a space
+            .replace(Regex("\\s+"), " ")  // Replace multiple spaces with a single space
+            .trim()
+    }
 
 
     private fun splitIntoParagraphs(text: String): List<String> {

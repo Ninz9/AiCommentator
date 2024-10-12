@@ -3,7 +3,7 @@ package com.github.ninz9.ideaplugin.formatters
 import com.intellij.openapi.components.Service
 
 @Service()
-class JavaDocFormatter: Formatter {
+class JavaDocFormatter : Formatter {
     private val JAVADOC_PATTERN = Regex(
         "/\\*\\*\\s*" +        // Start of JavaDoc comment
                 "(\\*\\s*.*\\s*)*" +   // Any number of lines starting with *
@@ -11,18 +11,16 @@ class JavaDocFormatter: Formatter {
         RegexOption.DOT_MATCHES_ALL
     )
 
-    private val PARAM_PATTERN = Regex("@param\\s+(\\w+)\\s+")
-    private val RETURN_PATTERN = Regex("@return\\s+")
-    private val THROWS_PATTERN = Regex("@throws\\s+(\\w+)\\s+")
+    private val paramPattern = Regex("@param\\s+(\\w+)\\s+")
+    private val returnPattern = Regex("@return\\s+")
+    private val throwsPattern = Regex("@throws\\s+(\\w+)\\s+")
+    private val propertiesPattern = Regex("@property\\s+(\\w+)\\s+")
 
-    override val newLineTags: Set<String>
-        get() = TODO("Not yet implemented")
-    override val linePrefix: String
-        get() = TODO("Not yet implemented")
-    override val commentPrefix: String
-        get() = TODO("Not yet implemented")
-    override val commentSuffix: String
-        get() = TODO("Not yet implemented")
+    override val newLineTags: Set<String> =
+        setOf("@param", "@return", "@throws", "@exception", "@see", "@since", "@deprecated", "@property")
+    override val linePrefix = "*"
+    override val commentPrefix = "/**"
+    override val commentSuffix = "*/"
 
     /**
      * Checks if the given string is a valid JavaDoc comment.
@@ -42,7 +40,7 @@ class JavaDocFormatter: Formatter {
      * @return True if all parameters are documented, false otherwise.
      */
     private fun hasAllParamsDocumented(javadoc: String, paramNames: List<String>): Boolean {
-        val documentedParams = PARAM_PATTERN.findAll(javadoc).map { it.groupValues[1] }.toSet()
+        val documentedParams = paramPattern.findAll(javadoc).map { it.groupValues[1] }.toSet()
         return paramNames.all { it in documentedParams }
     }
 
@@ -55,7 +53,7 @@ class JavaDocFormatter: Formatter {
      */
     private fun hasReturnDocumented(javadoc: String, hasReturnValue: Boolean): Boolean {
         return if (hasReturnValue) {
-            RETURN_PATTERN.containsMatchIn(javadoc)
+            returnPattern.containsMatchIn(javadoc)
         } else {
             true // No @return needed for void methods
         }
@@ -69,8 +67,13 @@ class JavaDocFormatter: Formatter {
      * @return True if all exceptions are documented, false otherwise.
      */
     private fun hasAllExceptionsDocumented(javadoc: String, exceptionNames: List<String>): Boolean {
-        val documentedExceptions = THROWS_PATTERN.findAll(javadoc).map { it.groupValues[1] }.toSet()
+        val documentedExceptions = throwsPattern.findAll(javadoc).map { it.groupValues[1] }.toSet()
         return exceptionNames.all { it in documentedExceptions }
+    }
+
+    private fun hasAllPropertiesDocumented(javadoc: String, propertyNames: List<String>): Boolean {
+        val documentedProperties = propertiesPattern.findAll(javadoc).map { it.groupValues[1] }.toSet()
+        return propertyNames.all { it in documentedProperties }
     }
 
     /**
@@ -84,39 +87,15 @@ class JavaDocFormatter: Formatter {
      */
     override fun isValidDoc(
         doc: String,
-//        paramNames: List<String>,
-//        hasReturnValue: Boolean,
-//        exceptionNames: List<String>
+        paramNames: List<String>,
+        hasReturnValue: Boolean,
+        exceptionNames: List<String>,
+        propertyNames: List<String>
     ): Boolean {
-        return isValidJavaDoc(doc)
-
-//             &&   hasAllParamsDocumented(doc, paramNames) &&
-//                hasReturnDocumented(doc, hasReturnValue) &&
-//                hasAllExceptionsDocumented(doc, exceptionNames)
-    }
-
-
-    override fun formatDoc(doc: String, maxLineLength: Int): String {
-        TODO("Not yet implemented")
+        return  isValidJavaDoc(doc) &&
+                hasAllParamsDocumented(doc, paramNames) &&
+                hasReturnDocumented(doc, hasReturnValue) &&
+                hasAllExceptionsDocumented(doc, exceptionNames) &&
+                hasAllPropertiesDocumented(doc, propertyNames)
     }
 }
-
-
-//fun main() {
-//    val javadoc = """
-//        /**
-//         * This is a sample JavaDoc comment.
-//         *
-//         * @param name The name parameter.
-//         * @param age The age parameter.
-//         * @return A greeting string.
-//         * @throws IllegalArgumentException If the name is empty.
-//         */
-//    """.trimIndent()
-//
-//    println("Is valid JavaDoc: ${JavaDocValidator.isValidJavaDoc(javadoc)}")
-//    println("All params documented: ${JavaDocValidator.hasAllParamsDocumented(javadoc, listOf("name", "age"))}")
-//    println("Return documented: ${JavaDocValidator.hasReturnDocumented(javadoc, true)}")
-//    println("Exceptions documented: ${JavaDocValidator.hasAllExceptionsDocumented(javadoc, listOf("IllegalArgumentException"))}")
-//    println("Is valid and complete: ${JavaDocValidator.isValidAndComplete(javadoc, listOf("name", "age"), true, listOf("IllegalArgumentException"))}")
-//}

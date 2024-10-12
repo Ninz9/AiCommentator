@@ -1,6 +1,6 @@
 package com.github.ninz9.ideaplugin.psi
 
-import com.github.ninz9.ideaplugin.utils.types.MethodStructure
+import com.github.ninz9.ideaplugin.utils.types.CodeStructure
 import com.intellij.openapi.application.ApplicationManager
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.components.Service
@@ -31,37 +31,23 @@ class JavaLangPsiManipulator : PsiManipulator {
         comment: String
     ) {
         val factory = JavaPsiFacade.getInstance(project).elementFactory
-
         WriteCommandAction.runWriteCommandAction(project) {
             val commentElement = factory.createDocCommentFromText(comment, element)
             val parent = element.parent
             if (element.containingFile != null && parent != null) {
+                deleteElementComment(project, element)
                 parent.addBefore(commentElement, element)
             }
         }
     }
 
-
-    override fun createCommentElement(project: Project, element: PsiElement): PsiElement {
-        TODO("Not yet implemented")
-    }
-
-    override fun addTextChunkToComment(
-        project: Project,
-        comment: PsiElement,
-        text: String
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun analyzePsiMethod(element: PsiElement): MethodStructure? {
+    override fun analyzePsiMethod(element: PsiElement): CodeStructure? {
         if (element !is PsiMethod) return null
 
-        return ApplicationManager.getApplication().runReadAction<MethodStructure> {
-            MethodStructure(
+        return ApplicationManager.getApplication().runReadAction<CodeStructure> {
+            CodeStructure(
                 code = element.text,
                 language = element.language.displayName,
-                complexity = "Complexity",
                 paramNames = element.parameterList.parameters.map { it.name },
                 hasReturnValue = element.returnType != null,
                 exceptionNames = element.throwsList.referenceElements.map { it.text },
@@ -69,34 +55,16 @@ class JavaLangPsiManipulator : PsiManipulator {
         }
     }
 
-    override fun analyzePsiClass(element: PsiElement): MethodStructure? {
+    override fun analyzePsiClass(element: PsiElement): CodeStructure? {
         if (element !is PsiClass) return null
 
-        return ApplicationManager.getApplication().runReadAction<MethodStructure> {
-            MethodStructure(
+        return ApplicationManager.getApplication().runReadAction<CodeStructure> {
+            CodeStructure(
                 code = element.text,
                 language = element.language.displayName,
-                complexity = "Complexity",
-                paramNames = emptyList(),
                 hasReturnValue = false,
-                exceptionNames = emptyList(),
+                paramNames = element.fields.map { it.name },
             )
         }
-        //TODO: Implement
-    }
-
-    override fun replaceCommentText(
-        project: Project,
-        element: PsiElement,
-        text: String
-    ) {
-        TODO("Not yet implemented")
-    }
-
-    override fun deleteElementComment(
-        project: Project,
-        element: PsiElement
-    ) {
-        TODO("Not yet implemented")
     }
 }

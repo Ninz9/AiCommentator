@@ -14,23 +14,19 @@ import kotlinx.coroutines.*
 
 class CreateCommentForClassStream : AnAction() {
 
-
-
     override fun actionPerformed(event: AnActionEvent) {
         val editor = event.getEditor() ?: return
         val project = event.project ?: return
         val file = event.getFile() ?: return
 
-
         val psiManipulator = service<LangManipulatorFactory>().getLangManipulator(event)
-
         val clazz = psiManipulator.getCaretClass(editor.caretModel.offset, file) ?: return
         val codeStructure = psiManipulator.analyzePsiClass(clazz) ?: return
 
         CoroutineScope(Dispatchers.IO).launch {
             val comment = service<GeneratorImpl>().generateCommentForClassStream(codeStructure)
             withContext(Dispatchers.Main) {
-                renderValidCommentGradually(psiManipulator, comment, project, clazz)
+                renderValidCommentGradually(psiManipulator, comment, project, clazz, codeStructure.language)
             }
         }
     }

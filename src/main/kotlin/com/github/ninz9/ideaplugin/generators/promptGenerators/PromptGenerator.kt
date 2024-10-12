@@ -1,53 +1,48 @@
 package com.github.ninz9.ideaplugin.generators.promptGenerators
 
-import com.github.ninz9.ideaplugin.utils.types.MethodStructure
+import com.github.ninz9.ideaplugin.utils.types.CodeStructure
 import com.github.ninz9.ideaplugin.utils.types.ModelMessage
 import com.intellij.openapi.components.Service
 
 @Service
 class PromptGenerator {
 
-    private val typeStreamPrompt = "Under no circumstances should you include the comment start and end characters (e.g. /** and */ for Java and Kotlin), or the newline character at the end."
+    private val typeStreamPrompt = "Your task is to generate code comments in KDoc, JavaDoc format. You will be provided with code for a method or a class." +
+            " For methods, generate a comment that includes:\n" +
+            "- A brief description of the method's purpose\n" +
+            "- @param for each parameter (if any)\n" +
+            "- @return with a description of the return value (if the method returns something)\n" +
+            "- @throws with a description of exceptions (if the method can throw any)\n" +
+            "For classes, generate a comment that includes:\n" +
+            "- A brief description of the class's purpose\n" +
+            "- @property for each class property\n" +
+            "- @constructor for the constructor (if present)\n" +
+            "Output only the ready-to-use comment without any additional explanations or surrounding text. \n" +
+            "Do not include any code snippets in the comment, and do not include any annotations other than the ones mentioned above."
 
-    fun generatePromptForMethod(methodStructure: MethodStructure): Collection<ModelMessage> {
-
-        val rolePrompt =
-            "You are acting as an assistant to generate comments for class methods. Your task is to create a brief and precise comment for the provided method in JavaDoc format. The comment should explain the method’s purpose, key input parameters, and return value if applicable. The response should contain only the comment text, without any additional formatting such as code blocks, backticks, or extra characters. This comment will be automatically inserted into the code, so avoid additional explanations or details."
+    fun generatePromptForMethod(codeStructure: CodeStructure): Collection<ModelMessage> {
 
         return listOf(
-            ModelMessage(
-                "assistant",
-                rolePrompt
-            ),
             ModelMessage(
                 "assistant",
                 typeStreamPrompt
             ),
             ModelMessage(
                 "user",
-                methodStructure.code
+                codeStructure.code
             )
         )
     }
-
-
-    fun generatePromptForClass(methodStructure: MethodStructure): Collection<ModelMessage> {
-
-        val rolePrompt =
-            "You are acting as an assistant to generate comments for classes. Your task is to create a brief and precise comment for the provided class in JavaDoc format. The comment should explain the class’s purpose, properties, key attributes, and any other relevant information. The response should contain only the comment and nothing else, without any additional formatting such as code blocks, backticks, or extra characters. This comment will be automatically inserted into the code, so avoid additional explanations or details."
+    fun generatePromptForClass(codeStructure: CodeStructure): Collection<ModelMessage> {
 
         return listOf(
-            ModelMessage(
-                "assistant",
-                rolePrompt
-            ),
             ModelMessage(
                 "assistant",
                 typeStreamPrompt
             ),
             ModelMessage(
                 "user",
-                methodStructure.code
+                codeStructure.code
             )
         )
     }
