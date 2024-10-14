@@ -18,10 +18,6 @@ class PluginSettings : PersistentStateComponent<PluginSettings.State> {
         var currentModel: AiModel = AiModel.entries.first()
     }
 
-    fun getInstance(): PluginSettings.State {
-        return service<PluginSettings>().state
-    }
-
     private var myState: State = State()
 
     override fun getState(): State {

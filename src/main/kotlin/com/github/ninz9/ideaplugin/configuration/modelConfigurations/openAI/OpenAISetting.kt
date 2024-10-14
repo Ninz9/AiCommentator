@@ -15,9 +15,10 @@ import com.intellij.openapi.components.service
 class OpenAISetting: PersistentStateComponent<OpenAISetting.State> {
 
     class State {
-        var currentModel: AvailableOpenAIModels = AvailableOpenAIModels.entries.first()
+        var model: AvailableOpenAIModels = AvailableOpenAIModels.entries.first()
         var temperature: Double = 0.7
         var maxTokens: Int = 1024
+        var isTokenSet: Boolean = false
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -25,31 +26,37 @@ class OpenAISetting: PersistentStateComponent<OpenAISetting.State> {
 
             other as State
 
-            if (currentModel != other.currentModel) return false
+            if (model != other.model) return false
             if (temperature != other.temperature) return false
             if (maxTokens != other.maxTokens) return false
-
             return true
+        }
+
+        override fun hashCode(): Int {
+            var result = model.hashCode()
+            result = 31 * result + temperature.hashCode()
+            result = 31 * result + maxTokens
+            return result
         }
     }
 
-    var openAiState = State()
+    private var state = State()
 
-    override fun getState(): State {
-        return openAiState
+    override fun getState(): OpenAISetting.State {
+        return state
     }
 
     override fun loadState(state: State) {
-        this.openAiState = state
+        this.state = state
     }
 
-    fun getApiToken(): String {
-        val apiKey = service<SecureTokenStorage>().getTokens(AiModel.OpenAI)
-        println("token $apiKey")
+    suspend fun getApiToken(): String {
+        val apiKey = service<SecureTokenStorage>().getToken(AiModel.OpenAI)
         return apiKey
     }
 
     fun saveApiToken(token: String) {
+        this.state.isTokenSet = true
         service<SecureTokenStorage>().setToken(AiModel.OpenAI, token)
     }
 }

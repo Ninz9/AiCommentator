@@ -1,29 +1,35 @@
 package com.github.ninz9.ideaplugin.configuration
 
+import com.github.ninz9.ideaplugin.MyBundle
+import com.github.ninz9.ideaplugin.llm.AiModel
 import com.intellij.openapi.components.service
-import com.intellij.openapi.options.Configurable
-import javax.swing.JComponent
+import com.intellij.openapi.options.BoundConfigurable
+import com.intellij.openapi.ui.ComboBox
+import com.intellij.openapi.ui.DialogPanel
+import com.intellij.ui.dsl.builder.Panel
+import com.intellij.ui.dsl.builder.bindItem
+import com.intellij.ui.dsl.builder.panel
+import com.intellij.ui.dsl.builder.toNullableProperty
 
-class PluginConfigurable: Configurable {
 
-    private var settingUiComponent: PluginSettingUi = PluginSettingUi()
+class PluginConfigurable: BoundConfigurable(MyBundle.message("name")) {
 
-    override fun createComponent(): JComponent {
-        return settingUiComponent.getComponent()
+    private var currentVendorComboBox: ComboBox<AiModel> =
+        ComboBox(AiModel.entries.toTypedArray())
+
+    override fun createPanel(): DialogPanel {
+        return panel {
+            vendorRow()
+            separator()
+        }
     }
 
-    override fun isModified(): Boolean {
-        val state: PluginSettings.State = service<PluginSettings>().state
-        return state.currentModel != settingUiComponent.getSelectedVendor()
-    }
+    fun Panel.vendorRow() {
+        row {
+            label(MyBundle.message("settings.selected_model")).widthGroup("labels")
 
-    override fun apply() {
-        val state: PluginSettings.State = service<PluginSettings>().state
-        state.currentModel = settingUiComponent.getSelectedVendor()
-        service<PluginSettings>().loadState(state)
-    }
-
-    override fun getDisplayName(): String {
-        return "My Plugin Settings"
+            cell(currentVendorComboBox)
+                .bindItem(service<PluginSettings>().state::currentModel.toNullableProperty())
+        }
     }
 }

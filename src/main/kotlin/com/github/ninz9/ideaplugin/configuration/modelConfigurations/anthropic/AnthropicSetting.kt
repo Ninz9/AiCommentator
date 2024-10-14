@@ -17,6 +17,7 @@ class AnthropicSetting: PersistentStateComponent<AnthropicSetting.State> {
         var model: AvailableAnthropicModels = AvailableAnthropicModels.haiku3
         var maxTokens: Int = 1024
         var temperature: Double = 0.5
+        var isTokenSet: Boolean = false
 
         override fun equals(other: Any?): Boolean {
             if (this === other) return true
@@ -30,6 +31,13 @@ class AnthropicSetting: PersistentStateComponent<AnthropicSetting.State> {
 
             return true
         }
+
+        override fun hashCode(): Int {
+            var result = model.hashCode()
+            result = 31 * result + maxTokens
+            result = 31 * result + temperature.hashCode()
+            return result
+        }
     }
 
     private var state = State()
@@ -39,14 +47,19 @@ class AnthropicSetting: PersistentStateComponent<AnthropicSetting.State> {
     }
 
     override fun loadState(newState: State) {
-        state = newState
+        if (newState.isTokenSet) {
+            state = newState
+        } else {
+            state = newState
+            state.isTokenSet = true
+        }
     }
 
-    fun getApiToken(): String {
-        return service<SecureTokenStorage>().getTokens(AiModel.Anthropic)
+    suspend fun getApiToken(): String {
+        return service<SecureTokenStorage>().getToken(AiModel.Anthropic)
     }
 
-    fun setApiToken(token: String) {
+    fun saveApiToken(token: String) {
         service<SecureTokenStorage>().setToken(AiModel.Anthropic, token)
     }
 }

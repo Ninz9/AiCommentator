@@ -11,8 +11,7 @@ import com.intellij.openapi.components.service
 @Service
 class ModelFactory {
 
-
-    fun getModel(): LLMClient {
+    suspend fun getModel(): LLMClient {
         val aiModel = service<PluginSettings>().state.currentModel
         return when (aiModel) {
             AiModel.OpenAI-> this.buildOpenAIModel()
@@ -21,14 +20,14 @@ class ModelFactory {
         }
     }
 
-    fun buildOpenAIModel(): OpenAiClient {
-        val token = service<OpenAISetting>().getApiToken() ?: throw IllegalArgumentException("No token found")
-        val modelState = service<OpenAISetting>().openAiState
-        return OpenAiClient(token, modelState.currentModel, modelState.maxTokens, modelState.temperature)
+    suspend fun buildOpenAIModel(): OpenAiClient {
+        val token = service<OpenAISetting>().getApiToken()
+        val modelState = service<OpenAISetting>().state
+        return OpenAiClient(token, modelState.model, modelState.maxTokens, modelState.temperature)
     }
 
-    fun buildAnthropicModel(): AnthropicClient {
-        val token = service<AnthropicSetting>().getApiToken() ?: throw IllegalArgumentException("No token found")
+    suspend fun buildAnthropicModel(): AnthropicClient {
+        val token = service<AnthropicSetting>().getApiToken()
         val modelState = service<AnthropicSetting>().state
         return AnthropicClient(token, modelState.model, modelState.maxTokens, modelState.temperature)
     }
