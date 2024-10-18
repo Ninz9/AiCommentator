@@ -1,11 +1,12 @@
 package com.github.ninz9.ideaplugin.formatters
 
+import com.github.ninz9.ideaplugin.utils.types.CodeStructure
 import com.intellij.openapi.components.Service
 
 @Service()
 class KotlinDocFormatter : Formatter {
 
-    private val KDOC_PATTERN = Regex(
+    private val kDocPattern = Regex(
         "/\\*\\*\\s*" +        // Start of KDoc comment
                 "(\\*\\s*.*\\s*)*" +   // Any number of lines starting with *
                 "\\*/",                // End of KDoc comment
@@ -13,20 +14,20 @@ class KotlinDocFormatter : Formatter {
     )
 
     override val newLineTags: Set<String> =
-        setOf("@param", "@return", "@throws", "@exception", "@see", "@since", "@deprecated", "@property")
+        setOf("@param", "@return", "@throws", "@exception", "@see", "@since", "@deprecated", "@property", "@constructor")
 
 
     private val paramPattern = Regex("@param\\s+(\\w+)\\s+")
     private val returnPattern = Regex("@return\\s+")
-    private val throwsPattern = Regex("@throws\\s+(\\w+)\\s+")
     private val propertiesPattern = Regex("@property\\s+(\\w+)\\s+")
 
     override val linePrefix = "*"
     override val commentPrefix = "/**"
     override val commentSuffix = "*/"
 
+
     private fun isValidKDoc(comment: String): Boolean {
-        return KDOC_PATTERN.matches(comment)
+        return kDocPattern.matches(comment)
     }
 
     /**

@@ -1,10 +1,11 @@
 package com.github.ninz9.ideaplugin.formatters
 
+import com.github.ninz9.ideaplugin.utils.types.CodeStructure
 import com.intellij.openapi.components.Service
 
 @Service()
 class JavaDocFormatter : Formatter {
-    private val JAVADOC_PATTERN = Regex(
+    private val javaDocPattern = Regex(
         "/\\*\\*\\s*" +        // Start of JavaDoc comment
                 "(\\*\\s*.*\\s*)*" +   // Any number of lines starting with *
                 "\\*/",                // End of JavaDoc comment
@@ -17,7 +18,7 @@ class JavaDocFormatter : Formatter {
     private val propertiesPattern = Regex("@property\\s+(\\w+)\\s+")
 
     override val newLineTags: Set<String> =
-        setOf("@param", "@return", "@throws", "@exception", "@see", "@since", "@deprecated", "@property")
+        setOf("@param", "@return", "@throws", "@exception", "@see", "@since", "@deprecated", "@property", "@constructor")
     override val linePrefix = "*"
     override val commentPrefix = "/**"
     override val commentSuffix = "*/"
@@ -29,7 +30,7 @@ class JavaDocFormatter : Formatter {
      * @return True if the string is a valid JavaDoc comment, false otherwise.
      */
     private fun isValidJavaDoc(comment: String): Boolean {
-        return JAVADOC_PATTERN.matches(comment)
+        return javaDocPattern.matches(comment)
     }
 
     /**
@@ -71,6 +72,14 @@ class JavaDocFormatter : Formatter {
         return exceptionNames.all { it in documentedExceptions }
     }
 
+
+    /**
+     * Checks if all specified properties are documented in the JavaDoc.
+     *
+     * @param javadoc The JavaDoc comment to check.
+     * @param propertyNames List of property names that need to be documented.
+     * @return True if all properties are documented, false otherwise.
+     */
     private fun hasAllPropertiesDocumented(javadoc: String, propertyNames: List<String>): Boolean {
         val documentedProperties = propertiesPattern.findAll(javadoc).map { it.groupValues[1] }.toSet()
         return propertyNames.all { it in documentedProperties }
