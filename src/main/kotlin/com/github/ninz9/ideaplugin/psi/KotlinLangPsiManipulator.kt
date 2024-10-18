@@ -46,7 +46,8 @@ class KotlinLangPsiManipulator : PsiManipulator {
             if (parent.containingFile != null && parent != null) {
                 deleteElementComment(project, element)
                 parent.addBefore(commentElement, element)
-                val logicalPosition = editor?.offsetToLogicalPosition(element.startOffset) ?: return@runWriteCommandAction
+                val logicalPosition =
+                    editor?.offsetToLogicalPosition(element.startOffset) ?: return@runWriteCommandAction
                 editor.scrollingModel.scrollTo(logicalPosition, ScrollType.MAKE_VISIBLE)
             }
         }
@@ -63,11 +64,6 @@ class KotlinLangPsiManipulator : PsiManipulator {
                 language = element.language.displayName,
                 paramNames = element.valueParameters.mapNotNull { it.name },
                 hasReturnValue = element.hasDeclaredReturnType(),
-                exceptionNames = element.bodyBlockExpression
-                    ?.children
-                    ?.filterIsInstance<KtThrowExpression>()
-                    ?.mapNotNull { it.text }
-                    .orEmpty()
             )
         }
     }
@@ -78,10 +74,14 @@ class KotlinLangPsiManipulator : PsiManipulator {
         }
 
         return ApplicationManager.getApplication().runReadAction<CodeStructure> {
+            val primaryConstructorProperties = element.primaryConstructorParameters.mapNotNull { it.name }
+            val bodyProperties = element.getProperties().mapNotNull { it.name }
+           val properties = primaryConstructorProperties + bodyProperties
+
             CodeStructure(
                 code = element.text,
                 language = element.language.displayName,
-                paramNames = element.getProperties().mapNotNull { it.name },
+                propertyNames = properties
             )
         }
     }

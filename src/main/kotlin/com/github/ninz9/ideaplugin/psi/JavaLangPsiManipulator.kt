@@ -36,7 +36,7 @@ class JavaLangPsiManipulator : PsiManipulator {
     ) {
         val factory = JavaPsiFacade.getInstance(project).elementFactory
         WriteCommandAction.runWriteCommandAction(project) {
-            val commentElement = factory.createDocCommentFromText(comment, element)
+            val commentElement = factory.createCommentFromText(comment, element)
             val parent = element.parent
             if (element.containingFile != null && parent != null) {
                 deleteElementComment(project, element)
@@ -67,7 +67,7 @@ class JavaLangPsiManipulator : PsiManipulator {
                 code = element.text,
                 language = element.language.displayName,
                 hasReturnValue = false,
-                paramNames = element.fields.map { it.name },
+                propertyNames = element.fields.map { it.name },
             )
         }
     }
