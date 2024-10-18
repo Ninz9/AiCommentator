@@ -58,7 +58,7 @@ class AnthropicClient(
             .filter {
                 it.data.type == "content_block_delta" || it.data.type == "content_block_start"
             }.map {
-                it.data?.delta?.text ?: ""
+                it.data.delta?.text ?: ""
             }
     }
 

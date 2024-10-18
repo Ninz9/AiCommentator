@@ -41,7 +41,7 @@ interface LLMSettingsPanel {
 
     fun Panel.maxTokensField(property: MutableProperty<Int>) {
         row {
-            label("Max tokens").widthGroup("labels")
+            label(AiCommentatorBundle.message("settings.max_tokens")).widthGroup("labels")
 
             textField()
                 .applyToComponent {

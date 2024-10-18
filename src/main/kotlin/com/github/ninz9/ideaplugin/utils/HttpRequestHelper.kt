@@ -18,7 +18,7 @@ import java.net.SocketTimeoutException
 
 
 /**
- * A helper class for making HTTP requests using OkHttp library.
+ * A helper class for making HTTP requests using the OkHttp library.
  */
 @Service()
 class HttpRequestHelper() {
@@ -76,7 +76,7 @@ class HttpRequestHelper() {
     }
 
     /**
-     * Executes a POST request to the given URL with the provided JSON body and headers, and deserializes the response.
+     * Executes a POST request to the given URL with the provided JSON body and headers and deserializes the response.
      *
      * @param url The URL to make the request to.
      * @param jsonBody The JSON body to be sent with the request.

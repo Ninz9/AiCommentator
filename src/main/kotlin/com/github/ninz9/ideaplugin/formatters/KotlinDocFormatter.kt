@@ -69,15 +69,14 @@ class KotlinDocFormatter : Formatter {
         return propertyNames.all { it in documentedProperties }
     }
 
+
     /**
-     * Checks the validity of a given Kotlin documentation string.
+     * Validates the provided KDoc string to ensure it adheres to the expected documentation standards
+     * by checking the presence of parameter and return value documentation.
      *
      * @param doc The KDoc string to validate.
-     * @param paramNames The list of parameter names that should be documented.
-     * @param hasReturnValue Indicates whether the method has a return value that needs to be documented.
-     * @param exceptionNames The list of exceptions that should be documented (currently unused).
-     * @param propertyNames The list of property names that should be documented.
-     * @return True if the KDoc is valid, false otherwise.
+     * @param codeStructure The structure of the code to validate against, containing parameter names, return value presence, and property names.
+     * @return True if the KDoc string is valid according to the given code structure, false otherwise.
      */
     override fun isValidDoc(
         doc: String,

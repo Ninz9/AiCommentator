@@ -1,6 +1,5 @@
 package com.github.ninz9.ideaplugin.utils
 
-import com.github.ninz9.ideaplugin.AiCommentatorBundle
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service

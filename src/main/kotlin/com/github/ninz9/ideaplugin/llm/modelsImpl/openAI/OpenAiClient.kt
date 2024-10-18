@@ -43,7 +43,7 @@ class OpenAiClient(
             OpenAiErrorResponse::class.java
         ).map {
             when (it) {
-                is ApiResponse.Success -> it.data.choices.first().delta?.content ?: ""
+                is ApiResponse.Success -> it.data.choices.first().delta.content
                 is ApiResponse.Error -> throw exceptionBuilder(it.error.error.code, it.error.error.message)
             }
         }

@@ -16,7 +16,7 @@ class AnthropicClientTest: BasePlatformTestCase() {
         apiToken = System.getenv("ANTHROPIC_API_KEY") ?: ""
         anthropicClient = AnthropicClient(
             token = apiToken,
-            model = AvailableAnthropicModels.sonnet35,
+            model = AvailableAnthropicModels.Sonnet35,
             maxTokens = 100,
             temperature = 0.7
         )
@@ -35,7 +35,7 @@ class AnthropicClientTest: BasePlatformTestCase() {
     fun testSendRequestWithInvalidToken() = runBlocking {
         val invalidClient = AnthropicClient(
             token = "invalid_token",
-            model = AvailableAnthropicModels.sonnet35,
+            model = AvailableAnthropicModels.Sonnet35,
             maxTokens = 100,
             temperature = 0.7
         )

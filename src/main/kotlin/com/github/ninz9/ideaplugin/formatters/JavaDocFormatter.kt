@@ -85,14 +85,13 @@ class JavaDocFormatter : Formatter {
         return propertyNames.all { it in documentedProperties }
     }
 
+
     /**
-     * Performs a comprehensive check of the JavaDoc against the method signature.
+     * Validates if the provided JavaDoc is complete and correctly formatted according to the given code structure.
      *
-     * @param doc The JavaDoc comment to check.
-     * @param paramNames List of parameter names from the method signature.
-     * @param hasReturnValue True if the method returns a value, false for void.
-     * @param exceptionNames List of exception names from the method signature.
-     * @return True if the JavaDoc is valid and complete, false otherwise.
+     * @param doc The JavaDoc string to validate.
+     * @param codeStructure An instance of CodeStructure containing details about the method or class that the JavaDoc should describe.
+     * @return True if the JavaDoc is valid and properly documents all elements, false otherwise.
      */
     override fun isValidDoc(
         doc: String,

@@ -32,7 +32,6 @@ import com.intellij.ui.dsl.builder.toNullableProperty
 class OpenAIConfigurable : BoundConfigurable("OpenAI"), LLMSettingsPanel {
 
     private val tokenField: JBPasswordField = JBPasswordField()
-    private var tokenIsSet = service<OpenAISetting>().state.isTokenSet
 
     private val currentModelComboBox: ComboBox<AvailableOpenAIModels> =
         ComboBox(EnumComboBoxModel(AvailableOpenAIModels::class.java))
@@ -45,10 +44,6 @@ class OpenAIConfigurable : BoundConfigurable("OpenAI"), LLMSettingsPanel {
             temperatureRow(service<OpenAISetting>().state::temperature.toMutableProperty())
             maxTokensField(service<OpenAISetting>().state::maxTokens.toMutableProperty())
         }
-    }
-
-    override fun apply() {
-        super.apply()
     }
 
     fun Panel.vendorRow() {
@@ -66,7 +61,6 @@ class OpenAIConfigurable : BoundConfigurable("OpenAI"), LLMSettingsPanel {
 
             cell(tokenField).columns(30).bindText(setter = {
                 service<OpenAISetting>().saveApiToken(it)
-                tokenIsSet = true
                 tokenField.text = ""
                 tokenField.emptyText.text = AiCommentatorBundle.message("settings.token.placeholder.stored")
             }, getter = {
