@@ -7,7 +7,10 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 
-@Service(Service.Level.PROJECT)
+/**
+ * Utility class for displaying various types of notifications within an IDE context.
+ */
+@Service()
 class NotificationsUtil {
 
     fun showInfo(message: String, project: Project) {

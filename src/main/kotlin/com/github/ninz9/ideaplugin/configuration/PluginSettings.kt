@@ -4,10 +4,17 @@ import com.github.ninz9.ideaplugin.llm.AiModel
 import com.intellij.openapi.components.PersistentStateComponent
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
-import com.intellij.openapi.components.service
 import org.jetbrains.annotations.NotNull
 
 
+/**
+ * A service class that handles the persistent state of plugin settings.
+ *
+ * This class is responsible for saving and loading the state of plugin settings,
+ * allowing the application to maintain user preferences across sessions.
+ *
+ * The state is stored in an XML file named `PluginState.xml`.
+ */
 @State(
     name = "com.github.ninz9.ideaplugin.configuration.PluginState",
     storages = [Storage("PluginState.xml")]

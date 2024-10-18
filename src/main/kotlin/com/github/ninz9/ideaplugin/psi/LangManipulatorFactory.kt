@@ -6,6 +6,10 @@ import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
 
 
+/**
+ * Factory service class responsible for providing the appropriate `PsiManipulator`
+ * implementation based on the language of the file within the given `AnActionEvent`.
+ */
 @Service
 class LangManipulatorFactory  {
     fun getLangManipulator(event: AnActionEvent): PsiManipulator {

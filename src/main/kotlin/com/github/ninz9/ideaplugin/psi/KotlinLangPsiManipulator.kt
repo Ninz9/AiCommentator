@@ -18,6 +18,10 @@ import org.jetbrains.kotlin.psi.KtThrowExpression
 import org.jetbrains.kotlin.psi.psiUtil.startOffset
 
 
+/**
+ * KotlinLangPsiManipulator is a service class that provides various manipulations
+ * and analyses on Kotlin PSI elements.
+ */
 @Service
 class KotlinLangPsiManipulator : PsiManipulator {
 

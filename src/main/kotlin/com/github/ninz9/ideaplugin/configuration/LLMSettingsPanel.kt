@@ -1,6 +1,6 @@
 package com.github.ninz9.ideaplugin.configuration
 
-import com.github.ninz9.ideaplugin.MyBundle
+import com.github.ninz9.ideaplugin.AiCommentatorBundle
 import com.github.ninz9.ideaplugin.utils.positiveIntValidation
 import com.github.ninz9.ideaplugin.utils.temperatureValidation
 import com.intellij.ui.dsl.builder.AlignX
@@ -11,6 +11,10 @@ import com.intellij.ui.dsl.builder.bindText
 import com.intellij.ui.dsl.builder.columns
 import kotlin.text.toDoubleOrNull
 
+/**
+ * Interface representing a settings panel for LLM (Large Language Models) configurations.
+ * Contain the realization of common UI elements such as temperature field and max token field
+ */
 interface LLMSettingsPanel {
 
     fun Panel.temperatureRow(property: MutableProperty<Double>) {

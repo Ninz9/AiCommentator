@@ -8,6 +8,13 @@ import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.State
 import com.intellij.openapi.components.service
 
+/**
+ * This class represents the settings for the OpenAI configuration.
+ *
+ * It implements the `PersistentStateComponent` interface, allowing it to persist its state.
+ * The state includes the selected OpenAI model, temperature settings, maximum tokens, and token status.
+ *
+ */
 @State(
     name = "OpenAIState",
     storages = [Storage("openAIState.xml")]

@@ -29,11 +29,25 @@ class KotlinDocFormatter : Formatter {
         return KDOC_PATTERN.matches(comment)
     }
 
+    /**
+     * Checks if all parameters listed in a method's signature are documented in the provided KDoc string.
+     *
+     * @param kdoc The KDoc string to check for parameter documentation.
+     * @param paramNames The list of parameter names that should be documented.
+     * @return True if all parameter names are found in the KDoc string, false otherwise.
+     */
     private fun hasAllParamsDocumented(kdoc: String, paramNames: List<String>): Boolean {
         val documentedParams = paramPattern.findAll(kdoc).map { it.groupValues[1] }.toSet()
         return paramNames.all { it in documentedParams }
     }
 
+    /**
+     * Checks if the KDoc string contains a @return tag when necessary.
+     *
+     * @param kdoc The KDoc string to check.
+     * @param hasReturnValue Indicates whether the method has a return value that needs to be documented.
+     * @return True if the return value is properly documented when necessary, false otherwise.
+     */
     private fun hasReturnDocumented(kdoc: String, hasReturnValue: Boolean): Boolean {
         return if (hasReturnValue) {
             returnPattern.containsMatchIn(kdoc)
@@ -42,16 +56,28 @@ class KotlinDocFormatter : Formatter {
         }
     }
 
-    fun hasAllExceptionsDocumented(kdoc: String, exceptionNames: List<String>): Boolean {
-        val documentedExceptions = throwsPattern.findAll(kdoc).map { it.groupValues[1] }.toSet()
-        return exceptionNames.all { it in documentedExceptions }
-    }
-
+    /**
+     * Checks if all properties in the given list are documented in the provided KDoc string.
+     *
+     * @param kdoc The KDoc string to search for property documentation.
+     * @param propertyNames The list of property names that should be documented.
+     * @return True if all property names are found in the KDoc string, false otherwise.
+     */
     fun hasAllPropertiesDocumented(kdoc: String, propertyNames: List<String>): Boolean {
         val documentedProperties = propertiesPattern.findAll(kdoc).map { it.groupValues[1] }.toSet()
         return propertyNames.all { it in documentedProperties }
     }
 
+    /**
+     * Checks the validity of a given Kotlin documentation string.
+     *
+     * @param doc The KDoc string to validate.
+     * @param paramNames The list of parameter names that should be documented.
+     * @param hasReturnValue Indicates whether the method has a return value that needs to be documented.
+     * @param exceptionNames The list of exceptions that should be documented (currently unused).
+     * @param propertyNames The list of property names that should be documented.
+     * @return True if the KDoc is valid, false otherwise.
+     */
     override fun isValidDoc(
         doc: String,
         paramNames: List<String>,

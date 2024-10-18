@@ -8,6 +8,18 @@ import com.intellij.openapi.components.State
 import com.intellij.openapi.components.Storage
 import com.intellij.openapi.components.service
 
+/**
+ * Class responsible for managing the persistent state of Anthropic settings.
+ *
+ * This class implements the PersistentStateComponent interface and manages its state
+ * using the nested State class which holds the configuration for Anthropic models,
+ * such as model type, maximum number of tokens, temperature, and token set status.
+ *
+ * The state is persisted in an XML file named anthropicState.xml.
+ *
+ * The class provides methods to get and load the state, along with functionality
+ * to manage API tokens securely through a SecureTokenStorage service.
+ */
 @State(
     name = "AnthropicState",
     storages = [Storage("anthropicState.xml")])

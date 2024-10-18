@@ -12,6 +12,10 @@ import com.intellij.psi.PsiMethod
 import com.intellij.psi.util.PsiTreeUtil
 
 
+/**
+ * JavaLangPsiManipulator is a service class that provides various manipulations
+ * and analyses on Java PSI elements.
+ */
 @Service
 class JavaLangPsiManipulator : PsiManipulator {
 

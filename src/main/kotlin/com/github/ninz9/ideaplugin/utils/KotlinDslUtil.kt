@@ -31,6 +31,12 @@ fun ValidationInfoBuilder.positiveIntValidation(text: String): ValidationInfo? {
 }
 
 
+/**
+ * Sets the empty text of the component contained within the cell.
+ *
+ * @param emptyText the string to be displayed as empty text
+ * @return the current cell for further configuration
+ */
 fun <T>Cell<T>.emptyText(emptyText: String) : Cell<T> where T : JComponent, T : ComponentWithEmptyText {
     this.component.emptyText.text = emptyText
     return this

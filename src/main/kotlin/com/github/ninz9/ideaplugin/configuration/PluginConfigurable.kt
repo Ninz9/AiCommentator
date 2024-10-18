@@ -1,6 +1,6 @@
 package com.github.ninz9.ideaplugin.configuration
 
-import com.github.ninz9.ideaplugin.MyBundle
+import com.github.ninz9.ideaplugin.AiCommentatorBundle
 import com.github.ninz9.ideaplugin.llm.AiModel
 import com.intellij.openapi.components.service
 import com.intellij.openapi.options.BoundConfigurable

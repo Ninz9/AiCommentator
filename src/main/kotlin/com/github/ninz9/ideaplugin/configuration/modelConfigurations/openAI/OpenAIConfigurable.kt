@@ -1,6 +1,6 @@
 package com.github.ninz9.ideaplugin.configuration.modelConfigurations.openAI
 
-import com.github.ninz9.ideaplugin.MyBundle
+import com.github.ninz9.ideaplugin.AiCommentatorBundle
 import com.github.ninz9.ideaplugin.configuration.LLMSettingsPanel
 import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.AvailableOpenAIModels
 import com.github.ninz9.ideaplugin.utils.emptyText
@@ -20,6 +20,15 @@ import com.intellij.ui.dsl.builder.toMutableProperty
 import com.intellij.ui.dsl.builder.toNullableProperty
 
 
+/**
+ * A configurable panel for OpenAI settings, providing UI components to set up the API token,
+ * select the desired OpenAI model, and configure model-specific parameters like temperature and max tokens.
+ *
+ * This class extends BoundConfigurable and implements LLMSettingsPanel to create
+ * a settings UI specific to OpenAI configurations.
+ *
+ * @constructor Creates an instance of OpenAIConfigurable.
+ */
 class OpenAIConfigurable : BoundConfigurable("OpenAI"), LLMSettingsPanel {
 
     private val tokenField: JBPasswordField = JBPasswordField()

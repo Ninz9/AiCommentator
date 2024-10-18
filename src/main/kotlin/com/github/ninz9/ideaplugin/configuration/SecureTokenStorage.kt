@@ -10,6 +10,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**
+ * Service class for secure storage and retrieval of tokens associated with different AI models.
+ *
+ * This class provides methods to store and retrieve tokens securely using the `PasswordSafe` service.
+ *
+ * @constructor Creates an instance of SecureTokenStorage.
+ */
 @Service
 class SecureTokenStorage() {
     val tokensMap = mutableMapOf<AiModel, String>()

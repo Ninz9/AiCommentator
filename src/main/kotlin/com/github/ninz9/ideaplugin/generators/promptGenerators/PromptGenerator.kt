@@ -4,6 +4,10 @@ import com.github.ninz9.ideaplugin.utils.types.CodeStructure
 import com.github.ninz9.ideaplugin.utils.types.ModelMessage
 import com.intellij.openapi.components.Service
 
+/**
+ * Service class for generating prompt messages to create code comments.
+ * This class facilitates the generation of documentation comments for methods and classes based on the given code structure.
+ */
 @Service
 class PromptGenerator {
 

@@ -1,6 +1,6 @@
 package com.github.ninz9.ideaplugin.configuration.modelConfigurations.anthropic
 
-import com.github.ninz9.ideaplugin.MyBundle
+import com.github.ninz9.ideaplugin.AiCommentatorBundle
 import com.github.ninz9.ideaplugin.configuration.LLMSettingsPanel
 import com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic.AvailableAnthropicModels
 import com.github.ninz9.ideaplugin.utils.emptyText
@@ -20,6 +20,12 @@ import com.intellij.ui.dsl.builder.toMutableProperty
 import com.intellij.ui.dsl.builder.toNullableProperty
 
 
+/**
+ * The AnthropicConfigurable class represents a configurable settings panel for Anthropic AI models.
+ * It extends the BoundConfigurable base class and implements the LLMSettingsPanel interface.
+ * This class provides a graphical user interface (GUI) for users to configure model selections,
+ * API tokens, temperature, and maximum number of tokens.
+ */
 class AnthropicConfigurable : BoundConfigurable("Anthropic AI"), LLMSettingsPanel {
 
     private val tokenField: JBPasswordField = JBPasswordField()

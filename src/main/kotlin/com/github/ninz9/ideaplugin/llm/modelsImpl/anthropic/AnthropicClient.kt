@@ -12,6 +12,14 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
 import org.json.JSONObject
 
+/**
+ * A client for interacting with Anthropic's API for Language Learning Models (LLM).
+ *
+ * @property token The API token used for authentication.
+ * @property model The specific model to be used for the requests.
+ * @property maxTokens The maximum number of tokens to generate.
+ * @property temperature The temperature parameter controls randomness in the response.
+ */
 class AnthropicClient(
     private val token: String,
     private val model: AvailableAnthropicModels,

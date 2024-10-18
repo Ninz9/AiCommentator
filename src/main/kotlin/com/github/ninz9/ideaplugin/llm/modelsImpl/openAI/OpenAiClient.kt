@@ -11,6 +11,14 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.json.JSONObject
 
+/**
+ * Client implementation for interacting with OpenAI's API using various models.
+ *
+ * @property token The authentication token for accessing OpenAI API.
+ * @property model The specific OpenAI model to be utilized for the requests.
+ * @property maxToken The maximum number of tokens to be used in the response.
+ * @property temperature The temperature setting affects the randomness of responses.
+ */
 class OpenAiClient(
     var token: String,
     val model: AvailableOpenAIModels,
