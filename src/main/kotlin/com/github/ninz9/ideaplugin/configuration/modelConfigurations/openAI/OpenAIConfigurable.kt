@@ -44,7 +44,7 @@ class OpenAIConfigurable : BoundConfigurable("OpenAI"), LLMSettingsPanel {
 
     fun Panel.vendorRow() {
         row {
-            label(MyBundle.message("settings.selected_model")).widthGroup("labels")
+            label(AiCommentatorBundle.message("settings.selected_model")).widthGroup("labels")
             cell(currentModelComboBox).columns(30).applyToComponent {
                 isEditable = true
             }.bindItem(service<OpenAISetting>().state::model.toNullableProperty())
@@ -53,24 +53,24 @@ class OpenAIConfigurable : BoundConfigurable("OpenAI"), LLMSettingsPanel {
 
     fun Panel.tokenRow() {
         row {
-            label(MyBundle.message("settings.token")).widthGroup("labels")
+            label(AiCommentatorBundle.message("settings.token")).widthGroup("labels")
 
             cell(tokenField).columns(30).bindText(setter = {
                 service<OpenAISetting>().saveApiToken(it)
                 tokenIsSet = true
                 tokenField.text = ""
-                tokenField.emptyText.text = MyBundle.message("settings.token.stored")
+                tokenField.emptyText.text = AiCommentatorBundle.message("settings.token.placeholder.stored")
             }, getter = {
                 ""
             }).emptyText(
-                if (tokenIsSet)
-                    MyBundle.message("settings.token.stored")
+                if (service<OpenAISetting>().state.isTokenSet)
+                    AiCommentatorBundle.message("settings.token.placeholder.stored")
                 else
-                    MyBundle.message("settings.token.placeholder")
+                    AiCommentatorBundle.message("settings.token.placeholder")
             ).applyToComponent {
                 isEditable = true
-            }.comment(MyBundle.message("settings.openAi.token.comment"), 30)
-            contextHelp(MyBundle.message("settings.token.help")).align(AlignX.LEFT)
+            }.comment(AiCommentatorBundle.message("settings.openAi.token.comment"), 30)
+            contextHelp(AiCommentatorBundle.message("settings.token.help")).align(AlignX.LEFT)
         }
     }
 }

@@ -1,18 +1,11 @@
 package com.github.ninz9.ideaplugin.utils
 
-import com.github.ninz9.ideaplugin.MyBundle
+import com.github.ninz9.ideaplugin.AiCommentatorBundle
 import com.intellij.openapi.ui.ValidationInfo
 import com.intellij.ui.dsl.builder.Cell
 import com.intellij.ui.layout.ValidationInfoBuilder
 import com.intellij.util.ui.ComponentWithEmptyText
 import javax.swing.JComponent
-
-fun ValidationInfoBuilder.notEmptyValidate(text: String): ValidationInfo? {
-    if (text.isBlank()) {
-        return error(MyBundle.message("settings.validation.required"))
-    }
-    return null
-}
 
 fun ValidationInfoBuilder.temperatureValidation(temperature: String): ValidationInfo? {
     if (temperature.isNotBlank()){
@@ -23,7 +16,7 @@ fun ValidationInfoBuilder.temperatureValidation(temperature: String): Validation
         }
     }
 
-    return error(MyBundle.message("settings.validation.temperature"))
+    return error(AiCommentatorBundle.message("settings.validation.temperature"))
 }
 
 fun ValidationInfoBuilder.positiveIntValidation(text: String): ValidationInfo? {
@@ -34,7 +27,7 @@ fun ValidationInfoBuilder.positiveIntValidation(text: String): ValidationInfo? {
            }
        }
    }
-    return error(MyBundle.message("settings.validation.positive_integer"))
+    return error(AiCommentatorBundle.message("settings.validation.positive_integer"))
 }
 
 

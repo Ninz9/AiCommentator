@@ -15,17 +15,23 @@ interface LLMSettingsPanel {
 
     fun Panel.temperatureRow(property: MutableProperty<Double>) {
         row {
-            label(MyBundle.message("settings.temperature")).widthGroup("labels")
-            textField().columns(30).bindText(setter = {
-                property.set(it.toDoubleOrNull() ?: 0.0)
-            }, getter = {
-                property.get().toString()
-            }).validationOnInput {
-                temperatureValidation(it.text)
-            }.validationOnApply {
+            label(AiCommentatorBundle.message("settings.temperature")).widthGroup("labels")
+
+            textField()
+                .applyToComponent {
+                    name = "temperatureField"
+                }
+                .columns(30)
+                .bindText(setter = {
+                    property.set(it.toDoubleOrNull() ?: 0.0)
+                }, getter = {
+                    property.get().toString()
+                }).validationOnInput {
+                    temperatureValidation(it.text)
+                }.validationOnApply {
                     temperatureValidation(it.text)
                 }
-            contextHelp(MyBundle.message("settings.temperature.help")).align(AlignX.LEFT)
+            contextHelp(AiCommentatorBundle.message("settings.temperature.help")).align(AlignX.LEFT)
         }
     }
 
@@ -34,6 +40,9 @@ interface LLMSettingsPanel {
             label("Max tokens").widthGroup("labels")
 
             textField()
+                .applyToComponent {
+                    name = "maxTokensField"
+                }
                 .columns(30)
                 .bindIntText(property)
                 .validationOnInput { positiveIntValidation(it.text) }

@@ -39,7 +39,7 @@ class AnthropicConfigurable : BoundConfigurable("Anthropic AI"), LLMSettingsPane
 
     fun Panel.vendorRow() {
         row {
-            label(MyBundle.message("settings.selected_model")).widthGroup("labels")
+            label(AiCommentatorBundle.message("settings.selected_model")).widthGroup("labels")
             cell(currentModelComboBox)
                 .columns(30)
                 .applyToComponent {
@@ -50,23 +50,23 @@ class AnthropicConfigurable : BoundConfigurable("Anthropic AI"), LLMSettingsPane
 
     fun Panel.tokenRow() {
         row {
-            label(MyBundle.message("settings.token")).widthGroup("labels")
+            label(AiCommentatorBundle.message("settings.token")).widthGroup("labels")
 
             cell(tokenField).bindText(setter = {
                 service<AnthropicSetting>().saveApiToken(it)
                 service<AnthropicSetting>().state.isTokenSet = true
                 tokenField.text = ""
-                tokenField.emptyText.text = MyBundle.message("settings.token.stored")
+                tokenField.emptyText.text = AiCommentatorBundle.message("settings.token.placeholder.stored")
             }, getter = {
                 ""
             }).columns(30).emptyText(
-                if (service<AnthropicSetting>().state.isTokenSet) MyBundle.message("settings.token.stored") else MyBundle.message(
+                if (service<AnthropicSetting>().state.isTokenSet) AiCommentatorBundle.message("settings.token.placeholder.stored") else AiCommentatorBundle.message(
                     "settings.token.placeholder"
                 )
             ).applyToComponent {
                 isEditable = true
-            }.comment(MyBundle.message("settings.anthropic.token.comment"), 30)
-            contextHelp(MyBundle.message("settings.token.help")).align(AlignX.LEFT)
+            }.comment(AiCommentatorBundle.message("settings.anthropic.token.comment"), 30)
+            contextHelp(AiCommentatorBundle.message("settings.token.help")).align(AlignX.LEFT)
         }
     }
 }
