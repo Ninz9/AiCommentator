@@ -30,18 +30,26 @@ class AnthropicClient(
             "content-Type" to "application/json"
         )
 
-        val response =  HttpRequestHelper().stream(
+        val response = HttpRequestHelper().stream(
             url,
             requestBody,
             headers,
-            AnthropicStreamResponse::class.java
+            AnthropicStreamResponse::class.java,
+            AnthropicErrorResponse::class.java
         )
 
-        return response.filter {
-            it.type == "content_block_delta" || it.type == "content_block_start"
-        }.map {
-            it?.delta?.text ?: ""
-        }
+        return response
+            .map {
+                when (it) {
+                    is ApiResponse.Success -> it
+                    is ApiResponse.Error -> throw Exception(it.error.error.message)
+                }
+            }
+            .filter {
+                it.data.type == "content_block_delta" || it.data.type == "content_block_start"
+            }.map {
+                it.data?.delta?.text ?: ""
+            }
     }
 
     override suspend fun sendRequest(messages: Collection<ModelMessage>): String {
@@ -89,7 +97,7 @@ class AnthropicClient(
         return json
     }
 
-    private fun  messageAdapter(messages: Collection<ModelMessage>): Map<String, Collection<String>> {
+    private fun messageAdapter(messages: Collection<ModelMessage>): Map<String, Collection<String>> {
         val mergedMessages = mutableMapOf<String, MutableList<String>>()
         messages.forEach {
             if (mergedMessages.containsKey(it.role)) {
@@ -100,5 +108,4 @@ class AnthropicClient(
         }
         return mergedMessages
     }
-
 }

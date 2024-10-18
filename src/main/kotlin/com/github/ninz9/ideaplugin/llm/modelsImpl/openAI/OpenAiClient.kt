@@ -23,25 +23,19 @@ class OpenAiClient(
 
     override suspend fun sendRequestStream(messages: Collection<ModelMessage>): Flow<String> {
 
-        if (token.isEmpty()) {
-            throw Exception("API token not found")
-        }
-
-
-        //val openAi: OpenAI  = OpenAI(token, timeout = Timeout(socket = 10.seconds))
         val requestBody = buildJsonRequestBody(messages, true)
-
-//        return openAi.chatCompletions(requestBody).map {
-//            it.choices.first().delta?.content ?: ""
-//        }.flowOn(Dispatchers.IO)
 
         return HttpRequestHelper().stream(
             url,
             requestBody,
             mapOf("Authorization" to authHeader),
-            StreamOpenAiResponse::class.java
+            StreamOpenAiResponse::class.java,
+            OpenAiErrorResponse::class.java
         ).map {
-            it.choices.first().delta?.content ?: ""
+            when (it) {
+                is ApiResponse.Success -> it.data.choices.first().delta?.content ?: ""
+                is ApiResponse.Error -> throw Exception(it.error.error.message)
+            }
         }
     }
 
@@ -50,9 +44,6 @@ class OpenAiClient(
 
         val requestBody = buildJsonRequestBody(messages, false)
 
-        if (token.isEmpty()) {
-            throw Exception("API token not found")
-        }
 
         val response = HttpRequestHelper().post(
             url,
@@ -82,5 +73,4 @@ class OpenAiClient(
             put("stream", isStreamRequest)
         }
     }
-
 }

@@ -10,30 +10,46 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.BufferedReader
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.iterator
 
+
+/**
+ * A helper class for making HTTP requests using OkHttp library.
+ */
 @Service()
 class HttpRequestHelper() {
 
     private val client = OkHttpClient()
 
-    fun <T> stream(
+    /**
+     * Streams data from a specified URL with a given JSON body and headers.
+     *
+     * @param url The URL to make the request to.
+     * @param jsonBody The JSON body to be sent with the request.
+     * @param headers Optional headers to include in the request.
+     * @param responseType The class to be used for successful response body deserialization.
+     * @param errorType The class to be used for error response body deserialization.
+     * @return A Flow emitting ApiResponse instances, representing either success or error.
+     */
+    fun <T, E> stream(
         url: String,
         jsonBody: JSONObject,
         headers: Map<String, String> = emptyMap(),
-        responseType: Class<T>
-    ): Flow<T> {
+        responseType: Class<T>,
+        errorType: Class<E>
+    ): Flow<ApiResponse<T, E>> {
 
         val request = buildRequest(url, jsonBody, headers)
         val tmp = client.newCall(request)
 
         return flow {
-
             val response = tmp.execute()
 
-            if (!response.isSuccessful) throw Exception("Unexpected response code: ${response.code}")
+            if (!response.isSuccessful) {
+                val errorBody = response.body?.string()
+                val error = Gson().fromJson(errorBody, errorType)
+                emit(ApiResponse.Error(error))
+                return@flow
+            }
 
             response.body?.use { responseBody ->
                 val source = responseBody.source()
@@ -41,25 +57,29 @@ class HttpRequestHelper() {
                 try {
                     while (!source.exhausted()) {
                         val line = reader.readLine() ?: break
-
                         if (line.startsWith("data:") && line != "data: [DONE]") {
                             val data = line.substringAfter("data: ")
                             val parsedData = Gson().fromJson(data, responseType)
-                            emit(parsedData)
+                            emit(ApiResponse.Success(parsedData))
                         }
                     }
-                } catch (e: Exception) {
-
-                    println("Error while reading stream: ${e.message}")
                 } finally {
                     reader.close()
                 }
             }
         }
-
-
     }
 
+    /**
+     * Executes a POST request to the given URL with the provided JSON body and headers, and deserializes the response.
+     *
+     * @param url The URL to make the request to.
+     * @param jsonBody The JSON body to be sent with the request.
+     * @param headers Optional headers to include in the request. Defaults to an empty map.
+     * @param responseType The class to be used for successful response body deserialization.
+     * @param errorType The class to be used for error response body deserialization.
+     * @return An instance of ApiResponse representing either a successful response or an error.
+     */
     fun <T, E> post(
         url: String,
         jsonBody: JSONObject,
