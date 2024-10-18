@@ -14,7 +14,7 @@ import com.intellij.openapi.components.service
 class AnthropicSetting: PersistentStateComponent<AnthropicSetting.State> {
 
     class State {
-        var model: AvailableAnthropicModels = AvailableAnthropicModels.haiku3
+        var model: AvailableAnthropicModels = AvailableAnthropicModels.entries.first()
         var maxTokens: Int = 1024
         var temperature: Double = 0.5
         var isTokenSet: Boolean = false
