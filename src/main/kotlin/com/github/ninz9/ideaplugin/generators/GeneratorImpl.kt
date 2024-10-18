@@ -24,7 +24,6 @@ class GeneratorImpl {
         val model = ModelFactory().getModel()
         val messages = service<PromptGenerator>().generatePromptForMethod(element)
         var res = model.sendRequest(messages)
-        checkValidity(element, res)
         return res
     }
 
@@ -38,7 +37,6 @@ class GeneratorImpl {
         val messages = service<PromptGenerator>().generatePromptForClass(element)
         val model = ModelFactory().getModel()
         val res = model.sendRequest(messages)
-        checkValidity(element, res)
         return res
     }
 
@@ -66,21 +64,5 @@ class GeneratorImpl {
         val model = ModelFactory().getModel()
 
         return model.sendRequestStream(messages)
-    }
-
-    /**
-     * Validates the documentation string for a given code structure.
-     *
-     * @param codeStructure The structure of the code for which the documentation is being validated.
-     * @param doc The documentation string that needs to be validated.
-     */
-    private fun checkValidity(codeStructure: CodeStructure, doc: String) {
-        val validator = FormatterFactory().getFormatter(codeStructure.language)
-        if (!validator.isValidDoc(
-                doc, codeStructure.paramNames, codeStructure.hasReturnValue, codeStructure.exceptionNames
-            )
-        ) {
-            throw IllegalArgumentException("Invalid documentation generated")
-        }
     }
 }
