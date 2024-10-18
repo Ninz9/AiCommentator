@@ -43,7 +43,7 @@ class AnthropicConfigurableTest: BasePlatformTestCase() {
     fun testTokenRowInitialization() {
         ApplicationManager.getApplication().getService(AnthropicSetting::class.java).state.isTokenSet = false
         val panel = anthropicConfigurable.createPanel()
-        val tokenField = findComponentByName(panel, "tokenField")
+        val tokenField = findComponentByClass(panel, JBPasswordField::class.java)
         assertNotNull(tokenField)
         assertEquals("", tokenField)
     }

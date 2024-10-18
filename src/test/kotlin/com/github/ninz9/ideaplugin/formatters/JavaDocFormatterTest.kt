@@ -1,5 +1,6 @@
 package com.github.ninz9.ideaplugin.formatters
 
+import com.github.ninz9.ideaplugin.utils.types.CodeStructure
 import com.intellij.testFramework.LightPlatformTestCase
 
 
@@ -18,7 +19,7 @@ class JavaDocFormatterTest : LightPlatformTestCase() {
              */
         """.trimIndent()
 
-        assertTrue(formatter.isValidDoc(validJavaDoc, listOf("name"), true, listOf("IllegalArgumentException"), emptyList()))
+        assertTrue(formatter.isValidDoc(validJavaDoc, CodeStructure("", "Java", listOf("name"), true, listOf("IllegalArgumentException"))))
     }
 
     fun `test isValidJavaDoc returns false for invalid JavaDoc`() {
@@ -28,7 +29,7 @@ class JavaDocFormatterTest : LightPlatformTestCase() {
              * Missing closing tag.
         """.trimIndent()
 
-        assertFalse(formatter.isValidDoc(invalidJavaDoc, listOf("name"), true, emptyList(), emptyList()))
+        assertFalse(formatter.isValidDoc(invalidJavaDoc, CodeStructure("", "Java", emptyList(), false)))
     }
 
     fun `test hasAllParamsDocumented returns true when all parameters are documented`() {
@@ -41,7 +42,7 @@ class JavaDocFormatterTest : LightPlatformTestCase() {
         """.trimIndent()
         val paramNames = listOf("name")
 
-        assertTrue(formatter.isValidDoc(javaDoc, paramNames, false, emptyList(), emptyList()))
+        assertTrue(formatter.isValidDoc(javaDoc, CodeStructure("", "Java", listOf("name"), false)))
     }
 
     fun `test hasAllParamsDocumented returns false when a parameter is missing`() {
@@ -54,7 +55,7 @@ class JavaDocFormatterTest : LightPlatformTestCase() {
         """.trimIndent()
         val paramNames = listOf("name", "age")
 
-        assertFalse(formatter.isValidDoc(javaDoc, paramNames, false, emptyList(), emptyList()))
+        assertFalse(formatter.isValidDoc(javaDoc, CodeStructure("", "Java", listOf("name", "age"), false)))
     }
 
     fun `test hasReturnDocumented returns true when return is present`() {
@@ -66,7 +67,7 @@ class JavaDocFormatterTest : LightPlatformTestCase() {
              */
         """.trimIndent()
 
-        assertTrue(formatter.isValidDoc(javaDoc, emptyList(), true, emptyList(), emptyList()))
+        assertTrue(formatter.isValidDoc(javaDoc, CodeStructure("", "Java", emptyList(), true)))
     }
 
     fun `test hasReturnDocumented returns false when return is missing for a non-void method`() {
@@ -76,7 +77,7 @@ class JavaDocFormatterTest : LightPlatformTestCase() {
              */
         """.trimIndent()
 
-        assertFalse(formatter.isValidDoc(javaDoc, emptyList(), true, emptyList(), emptyList()))
+        assertFalse(formatter.isValidDoc(javaDoc, CodeStructure("", "Java", listOf("name"), true)))
     }
 
     fun `test hasAllPropertiesDocumented returns true when all properties are documented`() {
@@ -87,9 +88,8 @@ class JavaDocFormatterTest : LightPlatformTestCase() {
              * @property name The name of the user.
              */
         """.trimIndent()
-        val propertyNames = listOf("name")
 
-        assertTrue(formatter.isValidDoc(javaDoc, emptyList(), false, emptyList(), propertyNames))
+        assertTrue(formatter.isValidDoc(javaDoc, CodeStructure("", "Java", emptyList(), false, emptyList(), listOf("name"))))
     }
 
     fun `test hasAllPropertiesDocumented returns false when a property is missing`() {
@@ -102,7 +102,7 @@ class JavaDocFormatterTest : LightPlatformTestCase() {
         """.trimIndent()
         val propertyNames = listOf("name", "age")
 
-        assertFalse(formatter.isValidDoc(javaDoc, emptyList(), false, emptyList(), propertyNames))
+        assertFalse(formatter.isValidDoc(javaDoc, CodeStructure("", "Java", emptyList(), false, emptyList(), listOf("name", "age"))))
     }
 
     fun `test formatDoc, input contain * and whitespaces`() {

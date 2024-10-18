@@ -1,5 +1,6 @@
 package com.github.ninz9.ideaplugin.formatters
 
+import com.github.ninz9.ideaplugin.utils.types.CodeStructure
 import com.intellij.testFramework.LightPlatformTestCase
 
 class KotlinDocFormatterTest: LightPlatformTestCase() {
@@ -17,7 +18,7 @@ class KotlinDocFormatterTest: LightPlatformTestCase() {
         """.trimIndent()
 
 
-        assertTrue(formatter.isValidDoc(validKDoc, listOf("name"), true, emptyList(), emptyList()))
+        assertTrue(formatter.isValidDoc(validKDoc, CodeStructure("", "Kotlin", listOf("name"), true)))
     }
 
 
@@ -28,7 +29,7 @@ class KotlinDocFormatterTest: LightPlatformTestCase() {
              * Missing closing tag.
         """.trimIndent()
 
-        assertFalse(formatter.isValidDoc(invalidKDoc, listOf("name"), true, emptyList(), emptyList()))
+        assertFalse(formatter.isValidDoc(invalidKDoc, CodeStructure("", "Kotlin", emptyList(), false)))
     }
 
     fun `test hasAllParamsDocumented returns true when all parameters are documented`() {
@@ -41,7 +42,7 @@ class KotlinDocFormatterTest: LightPlatformTestCase() {
         """.trimIndent()
         val paramNames = listOf("name")
 
-        assertTrue(formatter.isValidDoc(kdoc, paramNames, false, emptyList(), emptyList()))
+        assertTrue(formatter.isValidDoc(kdoc, CodeStructure("", "Kotlin", listOf("name"), false)))
     }
 
 
@@ -53,9 +54,8 @@ class KotlinDocFormatterTest: LightPlatformTestCase() {
              * @param name The name of the user.
              */
         """.trimIndent()
-        val paramNames = listOf("name", "age")
 
-        assertFalse(formatter.isValidDoc(kdoc, paramNames, false, emptyList(), emptyList()))
+        assertFalse(formatter.isValidDoc(kdoc, CodeStructure("", "Kotlin", listOf("name", "age"), false)))
     }
 
     fun `test hasReturnDocumented returns true when @return is present`() {
@@ -67,7 +67,7 @@ class KotlinDocFormatterTest: LightPlatformTestCase() {
              */
         """.trimIndent()
 
-        assertTrue(formatter.isValidDoc(kdoc, emptyList(), true, emptyList(), emptyList()))
+        assertTrue(formatter.isValidDoc(kdoc, CodeStructure("", "Kotlin", emptyList(), true)))
     }
 
 
@@ -78,7 +78,7 @@ class KotlinDocFormatterTest: LightPlatformTestCase() {
              */
         """.trimIndent()
 
-        assertFalse(formatter.isValidDoc(kdoc, emptyList(), true, emptyList(), emptyList()))
+        assertFalse(formatter.isValidDoc(kdoc, CodeStructure("", "Kotlin",emptyList(), true)))
     }
 
 
@@ -92,7 +92,7 @@ class KotlinDocFormatterTest: LightPlatformTestCase() {
         """.trimIndent()
         val propertyNames = listOf("name")
 
-        assertTrue(formatter.isValidDoc(kdoc, emptyList(), false, emptyList(), propertyNames))
+        assertTrue(formatter.isValidDoc(kdoc, CodeStructure("", "Kotlin", emptyList(), false, emptyList(), listOf("name"))))
     }
 
 
@@ -106,7 +106,7 @@ class KotlinDocFormatterTest: LightPlatformTestCase() {
         """.trimIndent()
         val propertyNames = listOf("name", "age")
 
-        assertFalse(formatter.isValidDoc(kdoc, emptyList(), false, emptyList(), propertyNames))
+        assertFalse(formatter.isValidDoc(kdoc, CodeStructure("", "Kotlin", emptyList(), false, emptyList(), listOf("name", "age"))))
     }
 
 
