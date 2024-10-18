@@ -1,7 +1,11 @@
 package com.github.ninz9.ideaplugin.utils
 
+import com.github.ninz9.ideaplugin.configuration.PluginSettings
+import com.github.ninz9.ideaplugin.utils.exeptions.AiCommentatorException
+import com.github.ninz9.ideaplugin.utils.exeptions.ErrorType
 import com.google.gson.Gson
 import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
@@ -10,6 +14,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.io.BufferedReader
+import java.net.SocketTimeoutException
 
 
 /**
@@ -88,8 +93,13 @@ class HttpRequestHelper() {
         errorType: Class<E>
     ): ApiResponse<T, E> {
         val request = buildRequest(url, jsonBody, headers)
+        val response: okhttp3.Response
+        try {
+            response = client.newCall(request).execute()
+        } catch (e: SocketTimeoutException) {
+            throw AiCommentatorException(ErrorType.TIMEOUT_ERROR, service<PluginSettings>().state.currentModel)
+        }
 
-        val response = client.newCall(request).execute()
         val body = response.body?.string()
 
         when (response.code) {

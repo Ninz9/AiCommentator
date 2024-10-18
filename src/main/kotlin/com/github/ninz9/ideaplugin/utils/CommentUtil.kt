@@ -1,7 +1,11 @@
 package com.github.ninz9.ideaplugin.utils
 
+import com.github.ninz9.ideaplugin.AiCommentatorBundle
 import com.github.ninz9.ideaplugin.formatters.FormatterFactory
 import com.github.ninz9.ideaplugin.psi.PsiManipulator
+import com.github.ninz9.ideaplugin.utils.exeptions.AiCommentatorException
+import com.github.ninz9.ideaplugin.utils.exeptions.handleAiCommenterError
+import com.github.ninz9.ideaplugin.utils.types.CodeStructure
 import com.intellij.openapi.components.service
 import com.intellij.openapi.project.Project
 import com.intellij.psi.PsiElement
@@ -19,14 +23,16 @@ import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.withContext
 import kotlin.time.Duration.Companion.milliseconds
 
+
 /**
- * Gradually renders a valid comment for the given PSI element by processing chunks of comments from a flow.
+ * Renders a valid comment gradually in an asynchronous manner by consuming strings from a provided flow,
+ * formatting them, and then inserting them before a specified PSI element within an IDE project.
  *
- * @param psiManipulator The PSI manipulator responsible for handling PSI operations.
- * @param commentFlow A flow of strings representing chunks of the comment text.
- * @param project The current project context.
- * @param element The PSI element before which the comment will be inserted.
- * @param language The programming language for which the comment formatting is needed.
+ * @param psiManipulator The `PsiManipulator` that handles PSI element manipulations.
+ * @param commentFlow The `Flow` of strings representing chunks of the comment to be rendered and inserted.
+ * @param project The current `Project` context in which the PSI element exists.
+ * @param element The `PsiElement` before which the generated comment will be inserted.
+ * @param codeStructure The `CodeStructure` representing the structure of the code related to the comment.
  */
 @OptIn(FlowPreview::class, kotlin.time.ExperimentalTime::class)
 suspend fun renderValidCommentGradually(
@@ -34,10 +40,10 @@ suspend fun renderValidCommentGradually(
     commentFlow: Flow<String>,
     project: Project,
     element: PsiElement,
-    language: String
+    codeStructure: CodeStructure
 ) {
     var accumulatedComment = ""
-    val formatter = service<FormatterFactory>().getFormatter(language)
+    val formatter = service<FormatterFactory>().getFormatter(codeStructure.language)
 
     commentFlow
         .onEach { chunk ->
@@ -52,10 +58,16 @@ suspend fun renderValidCommentGradually(
             }
         }
         .catch { e ->
-            println("Error in comment processing: ${e.message}")
+           if (e is AiCommentatorException) {
+               handleAiCommenterError(e, project)
+           }
         }
         .onCompletion {
+            if (accumulatedComment.trim().isBlank()) return@onCompletion
             val finalComment = formatter.formatDoc(accumulatedComment)
+             if (!formatter.isValidDoc(finalComment, codeStructure)) {
+                service<NotificationsUtil>().showWarning(AiCommentatorBundle.message("warning.message.incomplete_comment"), project)
+            }
             withContext(Dispatchers.Main) {
                 psiManipulator.insertCommentBeforeElement(project, element, finalComment)
             }

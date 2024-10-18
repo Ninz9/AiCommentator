@@ -1,8 +1,12 @@
 package com.github.ninz9.ideaplugin.actions
 
+import com.github.ninz9.ideaplugin.AiCommentatorBundle
 import com.github.ninz9.ideaplugin.formatters.FormatterFactory
 import com.github.ninz9.ideaplugin.generators.GeneratorImpl
 import com.github.ninz9.ideaplugin.psi.LangManipulatorFactory
+import com.github.ninz9.ideaplugin.utils.NotificationsUtil
+import com.github.ninz9.ideaplugin.utils.exeptions.AiCommentatorException
+import com.github.ninz9.ideaplugin.utils.exeptions.handleAiCommenterError
 import com.github.ninz9.ideaplugin.utils.getEditor
 import com.github.ninz9.ideaplugin.utils.getFile
 import com.intellij.openapi.actionSystem.ActionUpdateThread
@@ -26,9 +30,21 @@ class CreateCommentForClass : AnAction() {
         val codeStructure = psiManipulator.analyzePsiClass(clazz) ?: return
 
         CoroutineScope(Dispatchers.IO).launch {
+            var comment: String? = null
+            try {
+                comment = service<GeneratorImpl>().generateCommentForClass(codeStructure)
+            } catch (e: AiCommentatorException) {
+                handleAiCommenterError(e, project)
+                return@launch
+            }
+
             val codeFormatter = service<FormatterFactory>().getFormatter(codeStructure.language)
-            var comment = service<GeneratorImpl>().generateCommentForClass(codeStructure)
-            comment = codeFormatter.formatDoc( comment )
+            comment = codeFormatter.formatDoc(comment)
+
+            if (!codeFormatter.isValidDoc(comment, codeStructure)) {
+                service<NotificationsUtil>().showWarning(AiCommentatorBundle.message("warning.message.incomplete_comment"), project)
+            }
+
             withContext(Dispatchers.Main) {
                 psiManipulator.insertCommentBeforeElement(project, clazz, comment)
             }

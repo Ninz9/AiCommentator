@@ -80,16 +80,12 @@ class KotlinDocFormatter : Formatter {
      */
     override fun isValidDoc(
         doc: String,
-        paramNames: List<String>,
-        hasReturnValue: Boolean,
-        exceptionNames: List<String>,
-        propertyNames: List<String>
+        codeStructure: CodeStructure
     ): Boolean {
         return isValidKDoc(doc) &&
-                hasAllParamsDocumented(doc, paramNames) &&
-                hasReturnDocumented(doc, hasReturnValue) &&
-                hasAllExceptionsDocumented(doc, exceptionNames) &&
-                hasAllPropertiesDocumented(doc, propertyNames)
+                hasAllParamsDocumented(doc, codeStructure.paramNames) &&
+                hasReturnDocumented(doc, codeStructure.hasReturnValue) &&
+                hasAllPropertiesDocumented(doc, codeStructure.propertyNames)
     }
 }
 

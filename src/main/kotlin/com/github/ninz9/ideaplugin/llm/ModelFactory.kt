@@ -22,7 +22,6 @@ class ModelFactory {
         return when (aiModel) {
             AiModel.OpenAI-> this.buildOpenAIModel()
             AiModel.Anthropic -> this.buildAnthropicModel()
-            else -> throw IllegalArgumentException("Unsupported model")
         }
     }
 

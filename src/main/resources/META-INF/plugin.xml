@@ -9,21 +9,25 @@
     <depends>com.intellij.java</depends>
     <depends>org.jetbrains.kotlin</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
+    <resource-bundle>messages.AiCommentatorBundle</resource-bundle>
 
     <actions>
-        <group id="com.github.ninz9.ideaplugin.actions">
-            <separator/>
-            <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForFunction" id="CreateCommentForFunction"
-                    text="Generate Comment for Method"/>
+
+        <group id="com.github.ninz9.ideaplugin.group.actions"
+               class="com.intellij.openapi.actionSystem.DefaultActionGroup"
+               text="Ai Commentator"
+               popup="true">
             <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForClass" id="CreateCommentForClass"
                     text="Create Comment for Class"/>
             <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForClassStream"
-                    id="CreateCommentForClassStream" text="Create Comment for Class Stream"/>
+                    id="CreateCommentForClassStream" text="Create Comment for Class (Stream)"/>
+            <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForFunction"
+                    id="CreateCommentForMethod"
+                    text="Generate Comment for Method"/>
             <action class="com.github.ninz9.ideaplugin.actions.CreateCommentForMethodStream"
-                    id="CreateCommentForMethodStream" text="Create Comment for Method Stream"/>
+                    id="CreateCommentForMethodStream" text="Create Comment for Method (Stream)"/>
             <separator/>
-            <add-to-group group-id="EditorPopupMenu" anchor="first"/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
         </group>
 
     </actions>
@@ -41,21 +45,24 @@
                 parentId="tools"
                 instance="com.github.ninz9.ideaplugin.configuration.PluginConfigurable"
                 id="com.github.ninz9.ideaplugin.setting.ProjectSettingsConfigurable"
-                displayName="Idea Plugin"
+                key="settings.title"
+                name="AI Commentator"
                 nonDefaultProject="true"/>
         <applicationConfigurable
                 parentId="com.github.ninz9.ideaplugin.setting.ProjectSettingsConfigurable"
                 instance="com.github.ninz9.ideaplugin.configuration.modelConfigurations.openAI.OpenAIConfigurable"
                 id="com.github.ninz9.ideaplugin.setting.modelConfigurations.openai.OpenAIConfigurable"
-                displayName="OpenAI Configuration"
+                name="OpenAI"
+                key="settings.openAi.title"
                 nonDefaultProject="true"/>
         <applicationConfigurable
                 parentId="com.github.ninz9.ideaplugin.setting.ProjectSettingsConfigurable"
                 instance="com.github.ninz9.ideaplugin.configuration.modelConfigurations.anthropic.AnthropicConfigurable"
                 id="com.github.ninz9.ideaplugin.setting.modelConfigurations.anthropic.AnthropicConfigurable"
-                displayName="Anthropic Configuration"
+                name="Anthropic"
+                key="settings.anthropic.title"
                 nonDefaultProject="true"/>
-        <notificationGroup displayType="BALLOON" id="IdeaPlugin"/>
+        <notificationGroup displayType="BALLOON" id="ai.commentator.notification"/>
 
     </extensions>
 

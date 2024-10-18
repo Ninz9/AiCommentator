@@ -7,6 +7,8 @@ import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.post.OpenAIRespons
 import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.stream.StreamOpenAiResponse
 import com.github.ninz9.ideaplugin.utils.ApiResponse
 import com.github.ninz9.ideaplugin.utils.HttpRequestHelper
+import com.github.ninz9.ideaplugin.utils.exeptions.ErrorType
+import com.github.ninz9.ideaplugin.utils.exeptions.clientExeptions.OpenAIClientException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.json.JSONObject
@@ -42,7 +44,7 @@ class OpenAiClient(
         ).map {
             when (it) {
                 is ApiResponse.Success -> it.data.choices.first().delta?.content ?: ""
-                is ApiResponse.Error -> throw Exception(it.error.error.message)
+                is ApiResponse.Error -> throw exceptionBuilder(it.error.error.code, it.error.error.message)
             }
         }
     }
@@ -62,8 +64,14 @@ class OpenAiClient(
         )
 
         when (response) {
-            is ApiResponse.Error -> throw Exception(response.error.error.message)
-            is ApiResponse.Success -> return response.data.choices.first().message.content
+            is ApiResponse.Success -> {
+                val message = response.data.choices.first().message.content
+                if (message.isEmpty()) {
+                    throw OpenAIClientException(ErrorType.EMPTY_MESSAGE)
+                }
+                return message
+            }
+            is ApiResponse.Error -> throw exceptionBuilder(response.error.error.code, response.error.error.message)
         }
     }
 
@@ -79,6 +87,17 @@ class OpenAiClient(
             put("max_tokens", maxToken)
             put("temperature", temperature)
             put("stream", isStreamRequest)
+        }
+    }
+
+    private fun exceptionBuilder(errorType: String, errorMessage: String = ""): Exception {
+        return when (errorType) {
+            "invalid_api_key" -> OpenAIClientException(ErrorType.INVALID_TOKEN)
+            "rate_limit_reached" -> OpenAIClientException(ErrorType.RATE_LIMIT_ERROR)
+            "insufficient_quota" -> OpenAIClientException(ErrorType.INSUFFICIENT_QUOTA)
+            "server_error" -> OpenAIClientException(ErrorType.SERVER_ERROR)
+            "service_unavailable" -> OpenAIClientException(ErrorType.SERVICE_UNAVAILABLE)
+            else -> OpenAIClientException(ErrorType.UNKNOWN_ERROR, errorMessage)
         }
     }
 }

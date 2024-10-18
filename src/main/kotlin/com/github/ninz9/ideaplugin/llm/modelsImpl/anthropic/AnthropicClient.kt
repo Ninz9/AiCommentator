@@ -7,6 +7,8 @@ import com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic.data.post.AnthropicR
 import com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic.data.stream.AnthropicStreamResponse
 import com.github.ninz9.ideaplugin.utils.ApiResponse
 import com.github.ninz9.ideaplugin.utils.HttpRequestHelper
+import com.github.ninz9.ideaplugin.utils.exeptions.ErrorType
+import com.github.ninz9.ideaplugin.utils.exeptions.clientExeptions.AnthropicClientException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -25,7 +27,7 @@ class AnthropicClient(
     private val model: AvailableAnthropicModels,
     private val maxTokens: Int,
     private val temperature: Double
-): LLMClient {
+) : LLMClient {
 
 
     private val url = "https://api.anthropic.com/v1/messages"
@@ -50,7 +52,7 @@ class AnthropicClient(
             .map {
                 when (it) {
                     is ApiResponse.Success -> it
-                    is ApiResponse.Error -> throw Exception(it.error.error.message)
+                    is ApiResponse.Error -> throw exceptionBuilder(it.error.error.type, it.error.error.message)
                 }
             }
             .filter {
@@ -67,7 +69,7 @@ class AnthropicClient(
             "anthropic-version" to "2023-06-01",
             "x-api-key" to token,
             "content-Type" to "application/json"
-            )
+        )
 
         val response = HttpRequestHelper().post(
             url,
@@ -77,14 +79,15 @@ class AnthropicClient(
             AnthropicErrorResponse::class.java
         )
 
-        when(response) {
-            is ApiResponse.Error -> throw Exception(response.error.error.message)
+        when (response) {
             is ApiResponse.Success -> {
-                if (response.data.content.isEmpty()) {
-                    throw Exception("No messages returned")
+                val message = response.data.content
+                if (message.isEmpty()) {
+                    throw AnthropicClientException(ErrorType.EMPTY_MESSAGE)
                 }
                 return response.data.content.first().text
             }
+            is ApiResponse.Error ->  throw exceptionBuilder(response.error.error.type, response.error.error.message)
         }
     }
 
@@ -115,5 +118,17 @@ class AnthropicClient(
             }
         }
         return mergedMessages
+    }
+
+    private fun exceptionBuilder(errorType: String, errorMessage: String): Exception {
+        return when (errorType) {
+            "authentication_error" ->  AnthropicClientException(ErrorType.INVALID_TOKEN)
+            "permissions_error" ->  AnthropicClientException(ErrorType.PERMISSION_DENIED)
+            "request_too_large" -> AnthropicClientException(ErrorType.REQUEST_TOO_LARGE)
+            "rate_limit_error" -> AnthropicClientException(ErrorType.RATE_LIMIT_ERROR)
+            "api_error" -> AnthropicClientException(ErrorType.SERVER_ERROR)
+            "overloaded_error" -> AnthropicClientException(ErrorType.OVERLOADED_ERROR)
+            else -> AnthropicClientException(ErrorType.UNKNOWN_ERROR, errorMessage)
+        }
     }
 }

@@ -26,7 +26,7 @@ class CreateCommentForClassStream : AnAction() {
         CoroutineScope(Dispatchers.IO).launch {
             val comment = service<GeneratorImpl>().generateCommentForClassStream(codeStructure)
             withContext(Dispatchers.Main) {
-                renderValidCommentGradually(psiManipulator, comment, project, clazz, codeStructure.language)
+                renderValidCommentGradually(psiManipulator, comment, project, clazz, codeStructure)
             }
         }
     }

@@ -1,5 +1,7 @@
 package com.github.ninz9.ideaplugin.formatters
 
+import com.github.ninz9.ideaplugin.utils.types.CodeStructure
+
 /**
  * Interface defining a formatter for documentation comments.
  *
@@ -39,22 +41,17 @@ interface Formatter {
      */
     val commentSuffix: String
 
+
     /**
-     * Validates the format and content of a documentation comment.
+     * Validates the given document string against the provided code structure.
      *
-     * @param doc The documentation string to be validated.
-     * @param paramNames A list of parameter names that should be present in the documentation. Default is an empty list.
-     * @param hasReturnValue Indicates if the documentation should include a return value description. Default is false.
-     * @param exceptionNames A list of exception names that should be documented. Default is an empty list.
-     * @param propertyNames A list of property names that should be included in the documentation. Default is an empty list.
-     * @return True if the documentation is valid based on the provided criteria, false otherwise.
+     * @param doc The document string to be validated.
+     * @param codeStructure The CodeStructure instance against which the document will be validated.
+     * @return Boolean indicating whether the document string is valid according to the code structure.
      */
     fun isValidDoc(
         doc: String,
-        paramNames: List<String> = emptyList(),
-        hasReturnValue: Boolean = false,
-        exceptionNames: List<String> = emptyList(),
-        propertyNames: List<String> = emptyList()
+        codeStructure: CodeStructure
     ): Boolean
 
 
@@ -67,7 +64,6 @@ interface Formatter {
      */
     fun formatDoc(doc: String, maxLineLength: Int = 80): String {
         val cleanedText = removeCommentMarkers(doc)
-        println(cleanedText)
         val paragraphs = splitIntoParagraphs(cleanedText)
         val formattedParagraphs = formatParagraphs(paragraphs, maxLineLength)
         return assembleComment(formattedParagraphs)

@@ -33,13 +33,13 @@ class CreateCommentForMethodStream : AnAction() {
 
 
         val psiManipulator = service<LangManipulatorFactory>().getLangManipulator(event)
-        val clazz = psiManipulator.getCaretMethod(editor.caretModel.offset, file) ?: return
-        val codeStructure = psiManipulator.analyzePsiMethod(clazz) ?: return
+        val method = psiManipulator.getCaretMethod(editor.caretModel.offset, file) ?: return
+        val codeStructure = psiManipulator.analyzePsiMethod(method) ?: return
 
         CoroutineScope(Dispatchers.IO).launch {
             val comment = service<GeneratorImpl>().generateCommentForFunctionStream(codeStructure)
             withContext(Dispatchers.Main) {
-                renderValidCommentGradually(psiManipulator, comment, project, clazz, codeStructure.language)
+                renderValidCommentGradually(psiManipulator, comment, project, method, codeStructure)
             }
         }
     }
