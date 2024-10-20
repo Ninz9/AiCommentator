@@ -22,8 +22,7 @@ class GeneratorImpl {
     suspend fun generateCommentForFunction(element: CodeStructure): String {
         val model = ModelFactory().getModel()
         val messages = service<PromptGenerator>().generatePromptForMethod(element)
-        var res = model.sendRequest(messages)
-        return res
+        return model.sendRequest(messages)
     }
 
     /**
@@ -35,8 +34,7 @@ class GeneratorImpl {
     suspend fun generateCommentForClass(element: CodeStructure): String {
         val messages = service<PromptGenerator>().generatePromptForClass(element)
         val model = ModelFactory().getModel()
-        val res = model.sendRequest(messages)
-        return res
+        return model.sendRequest(messages)
     }
 
     /**
@@ -48,7 +46,6 @@ class GeneratorImpl {
     suspend fun generateCommentForFunctionStream(element: CodeStructure): Flow<String> {
         val model = ModelFactory().getModel()
         val messages = service<PromptGenerator>().generatePromptForMethod(element)
-
         return model.sendRequestStream(messages)
     }
 
@@ -61,7 +58,6 @@ class GeneratorImpl {
     suspend fun generateCommentForClassStream(element: CodeStructure): Flow<String> {
         val messages = service<PromptGenerator>().generatePromptForClass(element)
         val model = ModelFactory().getModel()
-
         return model.sendRequestStream(messages)
     }
 }

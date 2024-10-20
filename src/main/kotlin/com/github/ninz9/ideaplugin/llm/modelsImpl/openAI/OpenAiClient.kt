@@ -1,5 +1,7 @@
 package com.github.ninz9.ideaplugin.llm.modelsImpl.openAI
 
+import com.github.ninz9.ideaplugin.configuration.modelConfigurations.openAI.OpenAISetting
+import com.github.ninz9.ideaplugin.llm.AiModel
 import com.github.ninz9.ideaplugin.llm.LLMClient
 import com.github.ninz9.ideaplugin.utils.types.ModelMessage
 import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.error.OpenAiErrorResponse
@@ -7,35 +9,28 @@ import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.post.OpenAIRespons
 import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.data.stream.StreamOpenAiResponse
 import com.github.ninz9.ideaplugin.utils.ApiResponse
 import com.github.ninz9.ideaplugin.utils.HttpRequestHelper
-import com.github.ninz9.ideaplugin.utils.exeptions.ErrorType
-import com.github.ninz9.ideaplugin.utils.exeptions.clientExeptions.OpenAIClientException
+import com.github.ninz9.ideaplugin.utils.exeptions.AiCommentatorException
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.json.JSONObject
 
 /**
  * Client implementation for interacting with OpenAI's API using various models.
- *
- * @property token The authentication token for accessing OpenAI API.
- * @property model The specific OpenAI model to be utilized for the requests.
- * @property maxToken The maximum number of tokens to be used in the response.
- * @property temperature The temperature setting affects the randomness of responses.
  */
-class OpenAiClient(
-    var token: String,
-    val model: AvailableOpenAIModels,
-    val maxToken: Int,
-    val temperature: Double
-) : LLMClient {
-
+@Service()
+class OpenAiClient() : LLMClient {
     val url = "https://api.openai.com/v1/chat/completions"
-    val authHeader = "Bearer $token"
 
     override suspend fun sendRequestStream(messages: Collection<ModelMessage>): Flow<String> {
 
+        val token = service<OpenAISetting>().getApiToken()
+        val authHeader = "Bearer $token"
+
         val requestBody = buildJsonRequestBody(messages, true)
 
-        return HttpRequestHelper().stream(
+        return service<HttpRequestHelper>().stream(
             url,
             requestBody,
             mapOf("Authorization" to authHeader),
@@ -49,13 +44,14 @@ class OpenAiClient(
         }
     }
 
-
     override suspend fun sendRequest(messages: Collection<ModelMessage>): String {
+
+         val token = service<OpenAISetting>().getApiToken()
+        val authHeader = "Bearer $token"
 
         val requestBody = buildJsonRequestBody(messages, false)
 
-
-        val response = HttpRequestHelper().post(
+        val response = service<HttpRequestHelper>().post(
             url,
             requestBody,
             mapOf("Authorization" to authHeader),
@@ -67,7 +63,7 @@ class OpenAiClient(
             is ApiResponse.Success -> {
                 val message = response.data.choices.first().message.content
                 if (message.isEmpty()) {
-                    throw OpenAIClientException(ErrorType.EMPTY_MESSAGE)
+                    throw AiCommentatorException.EmptyMessage(AiModel.OpenAI)
                 }
                 return message
             }
@@ -77,27 +73,27 @@ class OpenAiClient(
 
     private fun buildJsonRequestBody(messages: Collection<ModelMessage>, isStreamRequest: Boolean): JSONObject {
         return JSONObject().apply {
-            put("model", model.modelName)
+            put("model", service<OpenAISetting>().state.model.modelName)
             put("messages", messages.map {
                 JSONObject().apply {
                     put("role", it.role)
                     put("content", it.message)
                 }
             })
-            put("max_tokens", maxToken)
-            put("temperature", temperature)
+            put("max_tokens", service<OpenAISetting>().state.maxTokens)
+            put("temperature", service<OpenAISetting>().state.temperature)
             put("stream", isStreamRequest)
         }
     }
 
     private fun exceptionBuilder(errorType: String, errorMessage: String = ""): Exception {
         return when (errorType) {
-            "invalid_api_key" -> OpenAIClientException(ErrorType.INVALID_TOKEN)
-            "rate_limit_reached" -> OpenAIClientException(ErrorType.RATE_LIMIT_ERROR)
-            "insufficient_quota" -> OpenAIClientException(ErrorType.INSUFFICIENT_QUOTA)
-            "server_error" -> OpenAIClientException(ErrorType.SERVER_ERROR)
-            "service_unavailable" -> OpenAIClientException(ErrorType.SERVICE_UNAVAILABLE)
-            else -> OpenAIClientException(ErrorType.UNKNOWN_ERROR, errorMessage)
+            "invalid_api_key" -> AiCommentatorException.InvalidToken(AiModel.OpenAI)
+            "rate_limit_reached" -> AiCommentatorException.RateLimitError(AiModel.OpenAI)
+            "insufficient_quota" -> AiCommentatorException.InsufficientQuota(AiModel.OpenAI)
+            "server_error" -> AiCommentatorException.ServerError(AiModel.OpenAI)
+            "service_unavailable" -> AiCommentatorException.ServiceUnavailable(AiModel.OpenAI)
+            else -> AiCommentatorException.UnknownError(AiModel.OpenAI, errorMessage)
         }
     }
 }

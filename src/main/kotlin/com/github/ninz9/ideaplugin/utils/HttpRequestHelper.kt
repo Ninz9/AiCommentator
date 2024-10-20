@@ -2,7 +2,6 @@ package com.github.ninz9.ideaplugin.utils
 
 import com.github.ninz9.ideaplugin.configuration.PluginSettings
 import com.github.ninz9.ideaplugin.utils.exeptions.AiCommentatorException
-import com.github.ninz9.ideaplugin.utils.exeptions.ErrorType
 import com.google.gson.Gson
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -12,9 +11,12 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.net.SocketTimeoutException
+import java.net.UnknownHostException
+import java.util.concurrent.TimeUnit
 
 
 /**
@@ -23,7 +25,12 @@ import java.net.SocketTimeoutException
 @Service()
 class HttpRequestHelper() {
 
-    private val client = OkHttpClient()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .writeTimeout(30, TimeUnit.SECONDS)
+        .build()
+    private val gson = Gson()
 
     /**
      * Streams data from a specified URL with a given JSON body and headers.
@@ -47,11 +54,19 @@ class HttpRequestHelper() {
         val tmp = client.newCall(request)
 
         return flow {
-            val response = tmp.execute()
+
+            val response: Response
+            try {
+                response = tmp.execute()
+            } catch (_: SocketTimeoutException) {
+                throw AiCommentatorException.TimeoutError(service<PluginSettings>().state.currentModel)
+            } catch (_: UnknownHostException) {
+                throw AiCommentatorException.TimeoutError(service<PluginSettings>().state.currentModel)
+            }
 
             if (!response.isSuccessful) {
                 val errorBody = response.body?.string()
-                val error = Gson().fromJson(errorBody, errorType)
+                val error = gson.fromJson(errorBody, errorType)
                 emit(ApiResponse.Error(error))
                 return@flow
             }
@@ -64,7 +79,7 @@ class HttpRequestHelper() {
                         val line = reader.readLine() ?: break
                         if (line.startsWith("data:") && line != "data: [DONE]") {
                             val data = line.substringAfter("data: ")
-                            val parsedData = Gson().fromJson(data, responseType)
+                            val parsedData = gson.fromJson(data, responseType)
                             emit(ApiResponse.Success(parsedData))
                         }
                     }
@@ -93,22 +108,25 @@ class HttpRequestHelper() {
         errorType: Class<E>
     ): ApiResponse<T, E> {
         val request = buildRequest(url, jsonBody, headers)
-        val response: okhttp3.Response
+        val response: Response
         try {
             response = client.newCall(request).execute()
-        } catch (e: SocketTimeoutException) {
-            throw AiCommentatorException(ErrorType.TIMEOUT_ERROR, service<PluginSettings>().state.currentModel)
+        } catch (_: SocketTimeoutException) {
+            throw AiCommentatorException.TimeoutError(service<PluginSettings>().state.currentModel)
+        } catch (_: UnknownHostException) {
+            throw AiCommentatorException.TimeoutError(service<PluginSettings>().state.currentModel)
         }
 
         val body = response.body?.string()
 
         when (response.code) {
             in 200..299 -> {
-                val data = Gson().fromJson(body, responseType)
+                val data = gson.fromJson(body, responseType)
                 return ApiResponse.Success(data)
             }
-            in 400..499 -> {
-                val error = Gson().fromJson(body, errorType)
+
+            in 400..599 -> {
+                val error = gson.fromJson(body, errorType)
                 return ApiResponse.Error(error)
             }
             else -> {

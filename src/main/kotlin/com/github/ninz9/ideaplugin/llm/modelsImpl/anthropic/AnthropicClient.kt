@@ -1,5 +1,7 @@
 package com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic
 
+import com.github.ninz9.ideaplugin.configuration.modelConfigurations.anthropic.AnthropicSetting
+import com.github.ninz9.ideaplugin.llm.AiModel
 import com.github.ninz9.ideaplugin.utils.types.ModelMessage
 import com.github.ninz9.ideaplugin.llm.LLMClient
 import com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic.data.error.AnthropicErrorResponse
@@ -7,8 +9,9 @@ import com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic.data.post.AnthropicR
 import com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic.data.stream.AnthropicStreamResponse
 import com.github.ninz9.ideaplugin.utils.ApiResponse
 import com.github.ninz9.ideaplugin.utils.HttpRequestHelper
-import com.github.ninz9.ideaplugin.utils.exeptions.ErrorType
-import com.github.ninz9.ideaplugin.utils.exeptions.clientExeptions.AnthropicClientException
+import com.github.ninz9.ideaplugin.utils.exeptions.AiCommentatorException
+import com.intellij.openapi.components.Service
+import com.intellij.openapi.components.service
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
@@ -16,31 +19,24 @@ import org.json.JSONObject
 
 /**
  * A client for interacting with Anthropic's API for Language Learning Models (LLM).
- *
- * @property token The API token used for authentication.
- * @property model The specific model to be used for the requests.
- * @property maxTokens The maximum number of tokens to generate.
- * @property temperature The temperature parameter controls randomness in the response.
  */
-class AnthropicClient(
-    private val token: String,
-    private val model: AvailableAnthropicModels,
-    private val maxTokens: Int,
-    private val temperature: Double
-) : LLMClient {
-
-
+@Service()
+class AnthropicClient() : LLMClient {
     private val url = "https://api.anthropic.com/v1/messages"
 
     override suspend fun sendRequestStream(messages: Collection<ModelMessage>): Flow<String> {
+
+        val token = service<AnthropicSetting>().getApiToken()
+
         val requestBody = buildJsonRequestBody(messageAdapter(messages), true)
+
         val headers = mapOf(
             "anthropic-version" to "2023-06-01",
             "x-api-key" to token,
             "content-Type" to "application/json"
         )
 
-        val response = HttpRequestHelper().stream(
+        val response = service<HttpRequestHelper>().stream(
             url,
             requestBody,
             headers,
@@ -64,14 +60,17 @@ class AnthropicClient(
 
     override suspend fun sendRequest(messages: Collection<ModelMessage>): String {
 
+         val token = service<AnthropicSetting>().getApiToken()
+
         val requestBody = buildJsonRequestBody(messageAdapter(messages), false)
+
         val headers = mapOf(
             "anthropic-version" to "2023-06-01",
             "x-api-key" to token,
             "content-Type" to "application/json"
         )
 
-        val response = HttpRequestHelper().post(
+        val response = service<HttpRequestHelper>().post(
             url,
             requestBody,
             headers,
@@ -83,7 +82,7 @@ class AnthropicClient(
             is ApiResponse.Success -> {
                 val message = response.data.content
                 if (message.isEmpty()) {
-                    throw AnthropicClientException(ErrorType.EMPTY_MESSAGE)
+                    throw AiCommentatorException.EmptyMessage(AiModel.Anthropic)
                 }
                 return response.data.content.first().text
             }
@@ -101,9 +100,9 @@ class AnthropicClient(
         )
         json.put("system", messages["assistant"]?.first() ?: "")
         json.put("messages", messagesJson)
-        json.put("model", model.modelName)
-        json.put("max_tokens", maxTokens)
-        json.put("temperature", temperature)
+        json.put("model", service<AnthropicSetting>().state.model.modelName)
+        json.put("max_tokens", service<AnthropicSetting>().state.maxTokens)
+        json.put("temperature", service<AnthropicSetting>().state.temperature)
         json.put("stream", stream)
         return json
     }
@@ -122,13 +121,13 @@ class AnthropicClient(
 
     private fun exceptionBuilder(errorType: String, errorMessage: String): Exception {
         return when (errorType) {
-            "authentication_error" ->  AnthropicClientException(ErrorType.INVALID_TOKEN)
-            "permissions_error" ->  AnthropicClientException(ErrorType.PERMISSION_DENIED)
-            "request_too_large" -> AnthropicClientException(ErrorType.REQUEST_TOO_LARGE)
-            "rate_limit_error" -> AnthropicClientException(ErrorType.RATE_LIMIT_ERROR)
-            "api_error" -> AnthropicClientException(ErrorType.SERVER_ERROR)
-            "overloaded_error" -> AnthropicClientException(ErrorType.OVERLOADED_ERROR)
-            else -> AnthropicClientException(ErrorType.UNKNOWN_ERROR, errorMessage)
+            "authentication_error" -> AiCommentatorException.InvalidToken(AiModel.Anthropic)
+            "permissions_error" -> AiCommentatorException.PermissionDenied(AiModel.Anthropic)
+            "request_too_large" -> AiCommentatorException.RequestTooLarge(AiModel.Anthropic)
+            "rate_limit_error" -> AiCommentatorException.RateLimitError(AiModel.Anthropic)
+            "api_error" -> AiCommentatorException.ServerError(AiModel.Anthropic)
+            "overloaded_error" -> AiCommentatorException.OverloadedError(AiModel.Anthropic)
+            else -> AiCommentatorException.UnknownError(AiModel.Anthropic, errorMessage)
         }
     }
 }

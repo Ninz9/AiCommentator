@@ -15,12 +15,7 @@ class OpenAIClientTest: BasePlatformTestCase() {
 
         // load api token from System environment
         apiToken = System.getenv("OPENAI_API_KEY") ?: ""
-        openAiClient = OpenAiClient(
-            token = apiToken,
-            model = AvailableOpenAIModels.Gpt4oMini,
-            maxToken = 100,
-            temperature = 0.7
-        )
+        openAiClient = OpenAiClient()
     }
 
     fun testSendRequest() = runBlocking {
@@ -34,12 +29,7 @@ class OpenAIClientTest: BasePlatformTestCase() {
     }
 
     fun testSendRequestWithInvalidToken() {
-        val invalidClient = OpenAiClient(
-            token = "invalid_token",
-            model = AvailableOpenAIModels.Gpt4oMini,
-            maxToken = 100,
-            temperature = 0.7
-        )
+        val invalidClient = OpenAiClient()
         val messages = listOf(ModelMessage("user", "Hello"))
 
         assertThrows(Exception::class.java) {

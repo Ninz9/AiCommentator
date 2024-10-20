@@ -1,5 +1,8 @@
 package com.github.ninz9.ideaplugin.utils
 
+import com.github.ninz9.ideaplugin.utils.exeptions.AiCommentatorException
+import com.intellij.notification.Notification
+import com.intellij.notification.NotificationAction
 import com.intellij.notification.NotificationGroupManager
 import com.intellij.notification.NotificationType
 import com.intellij.openapi.components.Service
@@ -21,9 +24,10 @@ class NotificationsUtil {
             .notify(project)
     }
 
-    fun showError(message: String, project: Project) {
+    fun showError(error: AiCommentatorException, project: Project) {
         service<NotificationGroupManager>().getNotificationGroup(notificationGroupName)
-            .createNotification(message, NotificationType.ERROR)
+            .createNotification(error.getDisplayMessage(), NotificationType.ERROR)
+            .addActionIfNotNull(error.getNotificationAction(project))
             .notify(project)
     }
 
@@ -31,5 +35,10 @@ class NotificationsUtil {
         service<NotificationGroupManager>().getNotificationGroup(notificationGroupName)
             .createNotification(message, NotificationType.WARNING)
             .notify(project)
+    }
+
+    fun Notification.addActionIfNotNull(action: NotificationAction?): Notification {
+        action?.let { addAction(it) }
+        return this
     }
 }

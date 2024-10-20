@@ -2,8 +2,6 @@ package com.github.ninz9.ideaplugin.llm
 
 import com.github.ninz9.ideaplugin.llm.modelsImpl.openAI.OpenAiClient
 import com.github.ninz9.ideaplugin.configuration.PluginSettings
-import com.github.ninz9.ideaplugin.configuration.modelConfigurations.anthropic.AnthropicSetting
-import com.github.ninz9.ideaplugin.configuration.modelConfigurations.openAI.OpenAISetting
 import com.github.ninz9.ideaplugin.llm.modelsImpl.anthropic.AnthropicClient
 import com.intellij.openapi.components.Service
 import com.intellij.openapi.components.service
@@ -16,24 +14,19 @@ import com.intellij.openapi.components.service
  */
 @Service
 class ModelFactory {
-
-    suspend fun getModel(): LLMClient {
+    fun getModel(): LLMClient {
         val aiModel = service<PluginSettings>().state.currentModel
         return when (aiModel) {
-            AiModel.OpenAI-> this.buildOpenAIModel()
+            AiModel.OpenAI -> this.buildOpenAIModel()
             AiModel.Anthropic -> this.buildAnthropicModel()
         }
     }
 
-    suspend fun buildOpenAIModel(): OpenAiClient {
-        val token = service<OpenAISetting>().getApiToken()
-        val modelState = service<OpenAISetting>().state
-        return OpenAiClient(token, modelState.model, modelState.maxTokens, modelState.temperature)
+    fun buildOpenAIModel(): OpenAiClient {
+        return service<OpenAiClient>()
     }
 
-    suspend fun buildAnthropicModel(): AnthropicClient {
-        val token = service<AnthropicSetting>().getApiToken()
-        val modelState = service<AnthropicSetting>().state
-        return AnthropicClient(token, modelState.model, modelState.maxTokens, modelState.temperature)
+    fun buildAnthropicModel(): AnthropicClient {
+        return service<AnthropicClient>()
     }
 }
