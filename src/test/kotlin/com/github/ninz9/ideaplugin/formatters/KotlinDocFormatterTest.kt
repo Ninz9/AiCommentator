@@ -40,7 +40,6 @@ class KotlinDocFormatterTest: LightPlatformTestCase() {
              * @param name The name of the user.
              */
         """.trimIndent()
-        val paramNames = listOf("name")
 
         assertTrue(formatter.isValidDoc(kdoc, CodeStructure("", "Kotlin", listOf("name"), false)))
     }
@@ -90,7 +89,6 @@ class KotlinDocFormatterTest: LightPlatformTestCase() {
              * @property name The name of the user.
              */
         """.trimIndent()
-        val propertyNames = listOf("name")
 
         assertTrue(formatter.isValidDoc(kdoc, CodeStructure("", "Kotlin", emptyList(), false, emptyList(), listOf("name"))))
     }
@@ -104,7 +102,6 @@ class KotlinDocFormatterTest: LightPlatformTestCase() {
              * @property name The name of the user.
              */
         """.trimIndent()
-        val propertyNames = listOf("name", "age")
 
         assertFalse(formatter.isValidDoc(kdoc, CodeStructure("", "Kotlin", emptyList(), false, emptyList(), listOf("name", "age"))))
     }

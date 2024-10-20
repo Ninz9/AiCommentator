@@ -40,7 +40,6 @@ class JavaDocFormatterTest : LightPlatformTestCase() {
              * @param name The name of the user.
              */
         """.trimIndent()
-        val paramNames = listOf("name")
 
         assertTrue(formatter.isValidDoc(javaDoc, CodeStructure("", "Java", listOf("name"), false)))
     }
@@ -53,7 +52,6 @@ class JavaDocFormatterTest : LightPlatformTestCase() {
              * @param name The name of the user.
              */
         """.trimIndent()
-        val paramNames = listOf("name", "age")
 
         assertFalse(formatter.isValidDoc(javaDoc, CodeStructure("", "Java", listOf("name", "age"), false)))
     }
@@ -100,7 +98,6 @@ class JavaDocFormatterTest : LightPlatformTestCase() {
              * @property name The name of the user.
              */
         """.trimIndent()
-        val propertyNames = listOf("name", "age")
 
         assertFalse(formatter.isValidDoc(javaDoc, CodeStructure("", "Java", emptyList(), false, emptyList(), listOf("name", "age"))))
     }
