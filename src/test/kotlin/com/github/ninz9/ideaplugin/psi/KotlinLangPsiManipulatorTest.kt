@@ -78,7 +78,8 @@ class KotlinLangPsiManipulatorTest: BasePlatformTestCase() {
         assertNotNull(element)
 
         runWriteAction {
-            manipulator.insertCommentBeforeElement(project, element!!, "// This is a test comment")
+            manipulator.insertCommentBeforeElement(project, element!!, "// This is a test comment",
+                "I HOPE YOU A HAPPY TODAY, IN CASE YOU A DONT, YOU MUST TO KNOW, THAT I.... I WISH YOU HAPPINESS ")
         }
 
         myFixture.checkResult("""
@@ -104,7 +105,7 @@ class KotlinLangPsiManipulatorTest: BasePlatformTestCase() {
         assertNotNull(element)
 
         runWriteAction {
-            manipulator.insertCommentBeforeElement(project, element!!, "// This is a test comment")
+            manipulator.insertCommentBeforeElement(project, element!!, "// This is a test comment", "ANIGILATORNAJA_PUSHKA2000")
         }
 
         myFixture.checkResult("""

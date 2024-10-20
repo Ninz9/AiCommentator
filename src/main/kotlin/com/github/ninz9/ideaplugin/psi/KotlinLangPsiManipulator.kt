@@ -35,19 +35,20 @@ class KotlinLangPsiManipulator : PsiManipulator {
     override fun insertCommentBeforeElement(
         project: Project,
         element: PsiElement,
-        comment: String
+        comment: String,
+        transactionId: String,
     ) {
         val factory = KtPsiFactory(project)
         val editor = FileEditorManager.getInstance(project).selectedTextEditor
 
-        WriteCommandAction.runWriteCommandAction(project) {
+        WriteCommandAction.writeCommandAction(project).withGroupId(transactionId).run<Throwable> {
             val commentElement = factory.createComment(comment)
             val parent = element.parent
             if (parent.containingFile != null && parent != null) {
                 deleteElementComment(project, element)
                 parent.addBefore(commentElement, element)
                 val logicalPosition =
-                    editor?.offsetToLogicalPosition(element.startOffset) ?: return@runWriteCommandAction
+                    editor?.offsetToLogicalPosition(element.startOffset) ?: return@run
                 editor.scrollingModel.scrollTo(logicalPosition, ScrollType.MAKE_VISIBLE)
             }
         }
@@ -76,7 +77,7 @@ class KotlinLangPsiManipulator : PsiManipulator {
         return ApplicationManager.getApplication().runReadAction<CodeStructure> {
             val primaryConstructorProperties = element.primaryConstructorParameters.mapNotNull { it.name }
             val bodyProperties = element.getProperties().mapNotNull { it.name }
-           val properties = primaryConstructorProperties + bodyProperties
+            val properties = primaryConstructorProperties + bodyProperties
 
             CodeStructure(
                 code = element.text,

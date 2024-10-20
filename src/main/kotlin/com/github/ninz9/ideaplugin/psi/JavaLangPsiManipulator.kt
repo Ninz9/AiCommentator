@@ -32,10 +32,12 @@ class JavaLangPsiManipulator : PsiManipulator {
     override fun insertCommentBeforeElement(
         project: Project,
         element: PsiElement,
-        comment: String
+        comment: String,
+        transactionId: String
     ) {
         val factory = JavaPsiFacade.getInstance(project).elementFactory
-        WriteCommandAction.runWriteCommandAction(project) {
+
+       WriteCommandAction.writeCommandAction(project).withGroupId(transactionId).run<Throwable> {
             val commentElement = factory.createCommentFromText(comment, element)
             val parent = element.parent
             if (element.containingFile != null && parent != null) {

@@ -98,7 +98,7 @@ class JavaLangPsiManipulatorTest: BasePlatformTestCase() {
         assertNotNull(element)
 
         WriteCommandAction.runWriteCommandAction(project) {
-            manipulator.insertCommentBeforeElement(project, element!!, "/** This is a test comment */")
+            manipulator.insertCommentBeforeElement(project, element!!, "/** This is a test comment */", "KEKW")
         }
 
         println(myFixture.toString())
@@ -127,7 +127,7 @@ class JavaLangPsiManipulatorTest: BasePlatformTestCase() {
         assertNotNull(element)
 
         WriteCommandAction.runWriteCommandAction(project) {
-            manipulator.insertCommentBeforeElement(project, element!!, "/** This is a test comment */")
+            manipulator.insertCommentBeforeElement(project, element!!, "/** This is a test comment */", "I HAVE A PEN, I HAVE AN APPLE, HWWWW APPLE PAN")
         }
 
         myFixture.checkResult("""

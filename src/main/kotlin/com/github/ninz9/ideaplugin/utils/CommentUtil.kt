@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.withContext
+import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 
 
@@ -44,6 +45,7 @@ suspend fun renderValidCommentGradually(
 ) {
     var accumulatedComment = ""
     val formatter = service<FormatterFactory>().getFormatter(codeStructure.language)
+    val transactionId = UUID.randomUUID().toString()
 
     commentFlow
         .onEach { chunk ->
@@ -54,7 +56,7 @@ suspend fun renderValidCommentGradually(
         .onEach {
             val formattedComment = formatter.formatDoc(accumulatedComment)
             withContext(Dispatchers.Main) {
-                psiManipulator.insertCommentBeforeElement(project, element, formattedComment)
+                psiManipulator.insertCommentBeforeElement(project, element, formattedComment, transactionId)
             }
         }
         .catch { e ->
@@ -69,9 +71,9 @@ suspend fun renderValidCommentGradually(
                 service<NotificationsUtil>().showWarning(AiCommentatorBundle.message("warning.message.incomplete_comment"), project)
             }
             withContext(Dispatchers.Main) {
-                psiManipulator.insertCommentBeforeElement(project, element, finalComment)
+                psiManipulator.insertCommentBeforeElement(project, element, finalComment, transactionId)
             }
         }
-        .flowOn(Dispatchers.Default)
+        .flowOn(Dispatchers.IO)
         .collect()
 }

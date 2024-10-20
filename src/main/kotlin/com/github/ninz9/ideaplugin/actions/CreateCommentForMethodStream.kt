@@ -12,7 +12,6 @@ import com.intellij.openapi.components.service
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
  * An action to create a comment for a method where the caret is currently positioned.
@@ -38,9 +37,7 @@ class CreateCommentForMethodStream : AnAction() {
 
         CoroutineScope(Dispatchers.IO).launch {
             val comment = service<GeneratorImpl>().generateCommentForFunctionStream(codeStructure)
-            withContext(Dispatchers.Main) {
-                renderValidCommentGradually(psiManipulator, comment, project, method, codeStructure)
-            }
+            renderValidCommentGradually(psiManipulator, comment, project, method, codeStructure)
         }
     }
 

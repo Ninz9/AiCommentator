@@ -17,6 +17,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.UUID
 
 class CreateCommentForFunction : AnAction() {
 
@@ -30,7 +31,7 @@ class CreateCommentForFunction : AnAction() {
         val codeStructure = psiManipulator.analyzePsiMethod(method) ?: return
 
         CoroutineScope(Dispatchers.IO).launch {
-            var comment: String? = null
+            var comment: String?
             try {
                 comment = service<GeneratorImpl>().generateCommentForFunction(codeStructure)
             } catch (e: AiCommentatorException) {
@@ -45,7 +46,7 @@ class CreateCommentForFunction : AnAction() {
             }
 
             withContext(Dispatchers.Main) {
-                psiManipulator.insertCommentBeforeElement(project, method, comment)
+                psiManipulator.insertCommentBeforeElement(project, method, comment, UUID.randomUUID().toString())
             }
         }
     }

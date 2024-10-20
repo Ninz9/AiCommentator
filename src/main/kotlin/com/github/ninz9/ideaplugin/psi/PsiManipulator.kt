@@ -57,8 +57,9 @@ interface PsiManipulator {
      * @param project The current project context.
      * @param element The PSI element before which the comment should be inserted.
      * @param comment The comment text to be inserted.
+     * @param transactionId The transaction ID used to group multiple changes to the PSI tree into a single transaction, ensuring proper undo functionality.
      */
-    fun insertCommentBeforeElement(project: Project, element: PsiElement, comment: String)
+    fun insertCommentBeforeElement(project: Project, element: PsiElement, comment: String, transactionId: String)
 
     /**
      * Analyzes the given `PsiElement` representing a method and extracts its code structure.
@@ -92,7 +93,9 @@ interface PsiManipulator {
                 sibling.delete()
             } else {
                 val innerComment = PsiTreeUtil.findChildOfType(element, PsiComment::class.java)
-                innerComment?.delete()
+                if (innerComment != null && innerComment.parent == element) {
+                    innerComment.delete()
+                }
             }
         }
     }
