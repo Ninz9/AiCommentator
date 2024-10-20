@@ -100,7 +100,6 @@ class CreateCommentForClassStreamTest: BasePlatformTestCase() {
                 }
             }
         """)
-
     }
 
     fun testVisibilityKotlin2() {
