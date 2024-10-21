@@ -1,18 +1,72 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
-    <id>com.github.ninz9.ideaplugin</id>
+    <id>com.github.ninz9.aicommentator</id>
     <name>IdeaPlugin</name>
     <vendor>ninz9</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.lang</depends>
+    <depends>com.intellij.java</depends>
+    <depends>org.jetbrains.kotlin</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
+    <resource-bundle>messages.AiCommentatorBundle</resource-bundle>
+
+    <actions>
+
+        <group id="com.github.ninz9.aicommentator.group.actions"
+               class="com.intellij.openapi.actionSystem.DefaultActionGroup"
+               text="Ai Commentator"
+               popup="true">
+            <action class="com.github.ninz9.aicommentator.actions.CreateCommentForClass" id="CreateCommentForClass"
+                    text="Create Comment for Class"/>
+            <action class="com.github.ninz9.aicommentator.actions.CreateCommentForClassStream"
+                    id="CreateCommentForClassStream" text="Create Comment for Class (Stream)"/>
+            <action class="com.github.ninz9.aicommentator.actions.CreateCommentForFunction"
+                    id="CreateCommentForMethod"
+                    text="Generate Comment for Method"/>
+            <action class="com.github.ninz9.aicommentator.actions.CreateCommentForMethodStream"
+                    id="CreateCommentForMethodStream" text="Create Comment for Method (Stream)"/>
+            <separator/>
+            <add-to-group group-id="EditorPopupMenu" anchor="last"/>
+        </group>
+
+    </actions>
+
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="com.github.ninz9.ideaplugin.toolWindow.MyToolWindowFactory" id="MyToolWindow"/>
+
+        <applicationService serviceImplementation="com.github.ninz9.aicommentator.configuration.PluginSettings"/>
+        <applicationService
+                serviceImplementation="com.github.ninz9.aicommentator.configuration.modelConfigurations.openAI.OpenAISetting"/>
+        <applicationService
+                serviceImplementation="com.github.ninz9.aicommentator.configuration.modelConfigurations.anthropic.AnthropicSetting"/>
+
+        <applicationConfigurable
+                parentId="tools"
+                instance="com.github.ninz9.aicommentator.configuration.PluginConfigurable"
+                id="com.github.ninz9.aicommentator.setting.ProjectSettingsConfigurable"
+                key="settings.title"
+                name="AI Commentator"
+                nonDefaultProject="true"/>
+        <applicationConfigurable
+                parentId="com.github.ninz9.aicommentator.setting.ProjectSettingsConfigurable"
+                instance="com.github.ninz9.aicommentator.configuration.modelConfigurations.openAI.OpenAIConfigurable"
+                id="com.github.ninz9.aicommentator.setting.modelConfigurations.openai.OpenAIConfigurable"
+                name="OpenAI"
+                key="settings.openAi.title"
+                nonDefaultProject="true"/>
+        <applicationConfigurable
+                parentId="com.github.ninz9.aicommentator.setting.ProjectSettingsConfigurable"
+                instance="com.github.ninz9.aicommentator.configuration.modelConfigurations.anthropic.AnthropicConfigurable"
+                id="com.github.ninz9.aicommentator.setting.modelConfigurations.anthropic.AnthropicConfigurable"
+                name="Anthropic"
+                key="settings.anthropic.title"
+                nonDefaultProject="true"/>
+        <notificationGroup displayType="BALLOON" id="ai.commentator.notification"/>
+
     </extensions>
 
-    <applicationListeners>
-        <listener class="com.github.ninz9.ideaplugin.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>
-    </applicationListeners>
+    <!--    <applicationListeners>-->
+    <!--        <listener class="com.github.ninz9.aicommentator.listeners.MyApplicationActivationListener" topic="com.intellij.openapi.application.ApplicationActivationListener"/>-->
+    <!--    </applicationListeners>-->
 </idea-plugin>
