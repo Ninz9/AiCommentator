@@ -48,4 +48,19 @@ class AnthropicClientTest: BasePlatformTestCase() {
         assertFalse(responses.isEmpty())
         responses.forEach { println(it) }
     }
+
+    fun testSendRequestWithDifferentRoles() = runBlocking {
+        val messages = listOf(
+            ModelMessage("system", "You are a helpful assistant."),
+            ModelMessage("user", "What's the capital of France?"),
+            ModelMessage("assistant", "The capital of France is Paris."),
+            ModelMessage("user", "What's its population?")
+        )
+
+        val response = anthropicClient.sendRequest(messages)
+
+        assertNotNull(response)
+        assertTrue(response.isNotEmpty())
+        println("Response: $response")
+    }
 }

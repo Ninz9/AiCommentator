@@ -17,16 +17,8 @@ class ModelFactory {
     fun getModel(): LLMClient {
         val aiModel = service<PluginSettings>().state.currentModel
         return when (aiModel) {
-            AiModel.OpenAI -> this.buildOpenAIModel()
-            AiModel.Anthropic -> this.buildAnthropicModel()
+            AiModel.OpenAI -> service<OpenAiClient>()
+            AiModel.Anthropic -> service<AnthropicClient>()
         }
-    }
-
-    fun buildOpenAIModel(): OpenAiClient {
-        return service<OpenAiClient>()
-    }
-
-    fun buildAnthropicModel(): AnthropicClient {
-        return service<AnthropicClient>()
     }
 }
