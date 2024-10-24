@@ -1,5 +1,6 @@
 package com.github.ninz9.aicommentator.psi
 
+import com.github.ninz9.aicommentator.utils.generateTransactionId
 import com.github.ninz9.aicommentator.utils.types.CodeStructure
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.project.Project
@@ -59,7 +60,7 @@ interface PsiManipulator {
      * @param comment The comment text to be inserted.
      * @param transactionId The transaction ID used to group multiple changes to the PSI tree into a single transaction, ensuring proper undo functionality.
      */
-    fun insertCommentBeforeElement(project: Project, element: PsiElement, comment: String, transactionId: String)
+    fun insertCommentBeforeElement(project: Project, element: PsiElement, comment: String, transactionId: String = generateTransactionId())
 
     /**
      * Analyzes the given `PsiElement` representing a method and extracts its code structure.
