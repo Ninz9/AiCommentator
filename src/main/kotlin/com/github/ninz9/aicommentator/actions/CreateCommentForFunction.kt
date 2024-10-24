@@ -17,7 +17,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.UUID
 
 class CreateCommentForFunction : AnAction() {
 
@@ -46,7 +45,7 @@ class CreateCommentForFunction : AnAction() {
             }
 
             withContext(Dispatchers.Main) {
-                psiManipulator.insertCommentBeforeElement(project, method, comment, UUID.randomUUID().toString())
+                psiManipulator.insertCommentBeforeElement(project, method, comment)
             }
         }
     }

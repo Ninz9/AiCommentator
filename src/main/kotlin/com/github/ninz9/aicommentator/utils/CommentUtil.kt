@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.withContext
-import java.util.UUID
 import kotlin.time.Duration.Companion.milliseconds
 
 
@@ -45,7 +44,7 @@ suspend fun renderValidCommentGradually(
 ) {
     var accumulatedComment = ""
     val formatter = service<FormatterFactory>().getFormatter(codeStructure.language)
-    val transactionId = UUID.randomUUID().toString()
+    val transactionId = generateTransactionId()
 
     commentFlow
         .onEach { chunk ->
@@ -77,3 +76,7 @@ suspend fun renderValidCommentGradually(
         .flowOn(Dispatchers.IO)
         .collect()
 }
+
+
+fun generateTransactionId() = "${System.currentTimeMillis()}_${(0..1000).random()}"
+
